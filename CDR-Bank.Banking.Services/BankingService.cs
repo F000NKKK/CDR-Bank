@@ -95,12 +95,13 @@ namespace CDR_Bank.Banking.Services
         {
             var account = _accountValidationService.GetAccountIfOpen(bankingAccountId)
                           ?? throw new InvalidOperationException("Account not found or is closed.");
-            account.Balance += amount;
 
             if (amount > AMOUNT_FOR_THE_BONUS)
             {
                 amount += BONUS_AMOUNT;
             }
+
+            account.Balance += amount;
 
             _bankingDataContext.Transactions.Add(new AccountTransaction
             {
