@@ -57,6 +57,14 @@ namespace CDR_Bank.Hub.Controllers
         public ActionResult<UserData> GetUser()
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Split(' ')[1];
+            }
+            else
+            {
+                return BadRequest("Bad token");
+            }
             UserData result = _identityService.GetUserData(token);
             return Ok(result);
         }
@@ -67,6 +75,14 @@ namespace CDR_Bank.Hub.Controllers
         public ActionResult<UserContactInfoContract> GetUserContactInfo()
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Split(' ')[1];
+            }
+            else
+            {
+                return BadRequest("Bad token");
+            }
             UserContactInfoContract result = _identityService.GetUserContactsData(token);
             return Ok(result);
         }
@@ -78,6 +94,14 @@ namespace CDR_Bank.Hub.Controllers
         public ActionResult<TokenResponse> ChangePassword(PasswordChange passwordChange)
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Split(' ')[1];
+            }
+            else
+            {
+                return BadRequest("Bad token");
+            }
             bool result = _identityService.ChangePassword(token, passwordChange);
             if (!result)
             {
