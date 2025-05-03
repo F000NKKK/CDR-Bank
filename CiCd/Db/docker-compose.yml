@@ -1,33 +1,19 @@
-version: '3.1'
-
 services:
   cdr-bank-mysql:
     image: mysql:8.0.36
     container_name: cdr-bank-mysql
     restart: unless-stopped
     environment:
-      # root‑доступ
       MYSQL_ROOT_PASSWORD: rootpassword
-      # дополнительный пользователь
       MYSQL_USER: bankuser
       MYSQL_PASSWORD: bankpass
     volumes:
-      # Персистентное хранение данных
       - mysql-data:/var/lib/mysql
-      # Скрипты инициализации
       - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    # Пробрасываем порт 3306 контейнера на хост (все интерфейсы)
     ports:
       - "3306:3306"
-    networks:
-      vp_subnet:
-        ipv4_address: 172.35.0.20
-        aliases:
-          - cdr-bank-db
 
 volumes:
   mysql-data:
     driver: local
-
-networks:
-  vp_subnet:
-    external: true
