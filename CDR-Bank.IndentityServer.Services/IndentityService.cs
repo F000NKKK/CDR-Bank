@@ -47,10 +47,12 @@ namespace CDR_Bank.IndentityServer.Services
             {
                 Id = Guid.NewGuid(),
                 Email = registrationData.Email,
-                PasswordHash = passwordHash.ToString()
+                PasswordHash = passwordHash!.ToString()
             };
 
-            UserContactInfo userContactInfo = user.ContactInfo;
+            _context.Users.Add(user);
+
+            var userContactInfo = new UserContactInfo();
             userContactInfo.City = registrationData.City;
             userContactInfo.Country = registrationData.Country;
             userContactInfo.Address = registrationData.Address;
@@ -59,7 +61,10 @@ namespace CDR_Bank.IndentityServer.Services
             userContactInfo.LastName = registrationData.LastName;
             userContactInfo.FirstName = registrationData.FirstName;
             userContactInfo.MiddleName = registrationData.MiddleName;
-            userContactInfo.BirthDate = DateTime.Parse( registrationData.BirthDate);
+            userContactInfo.BirthDate = DateTime.Parse(registrationData.BirthDate);
+
+            user.ContactInfo = userContactInfo;
+
             _context.Users.Add(user);
             _context.SaveChanges();
             return GenerateJwtToken(user.Id, user.Email);

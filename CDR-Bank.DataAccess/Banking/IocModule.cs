@@ -27,7 +27,9 @@ namespace CDR_Bank.DataAccess.Banking
 
                 var context = new BankingDataContext(optionsBuilder.Options);
 
-                return context.ApplyMigrationsIfNotEf();
+                context.Database.Migrate();
+
+                return context;
             })
             .AsSelf()
             .As<DbContext>()
