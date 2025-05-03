@@ -126,6 +126,9 @@ namespace CDR_Bank.Banking.Services
         public bool Transfer(Guid bankingAccountId, string recipientTelephoneNumber, decimal amount)
         {
             var senderAccount = GetAccountIfOpen(bankingAccountId);
+            if (senderAccount == null || senderAccount.Type == BankAccountType.Debit && HasNegativeCreditBalance(senderAccount.UserId))
+                return false;
+
             if (senderAccount == null || senderAccount.Balance < amount)
                 return false;
 
@@ -181,6 +184,8 @@ namespace CDR_Bank.Banking.Services
         public bool Withdraw(Guid bankingAccountId, decimal amount)
         {
             var account = GetAccountIfOpen(bankingAccountId);
+            if (account == null || account.Type == BankAccountType.Debit && HasNegativeCreditBalance(account.UserId))
+                return false;
 
             if (amount > MAX_WITHDRAW_AMOUNT)
                 return false;
@@ -216,7 +221,11 @@ namespace CDR_Bank.Banking.Services
 
         public bool InternalTransfer(Guid sourceAccountId, Guid destinationAccountId, decimal amount)
         {
+
             var source = GetAccountIfOpen(sourceAccountId);
+            if (source == null || source.Type == BankAccountType.Debit && HasNegativeCreditBalance(source.UserId))
+                return false;
+
             var dest = GetAccountIfOpen(destinationAccountId);
 
             if (source == null || dest == null || source.Balance < amount)
@@ -353,6 +362,11 @@ namespace CDR_Bank.Banking.Services
 
                 account.IsMain = isMain.Value;
             }
+        }
+        private bool HasNegativeCreditBalance(Guid userId)
+        {
+            return _bankingDataContext.BankAccounts
+                .Any(a => a.UserId == userId && a.Type == BankAccountType.Credit && a.Balance <= -20_000m);
         }
 
         private const decimal MAX_WITHDRAW_AMOUNT = 30_000m;
