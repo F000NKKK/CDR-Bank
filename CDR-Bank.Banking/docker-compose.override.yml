@@ -18,7 +18,7 @@ services:
       # IP из локальной сети, например
       CONTAINER_IP: 172.35.0.10
       AUTHORIZATION_ENDPOINT: http://localhost:5000
-      BANKING_DB_CONNECTION_STRING: "Server=host.docker.internal;Database=cd_bank;User Id=root;Password=pass;"
+      BANKING_DB_CONNECTION_STRING: "Server=cdr-bank-db;Database=BankingDb;User Id=root;Password=pass;"
 
     # Для простоты монтируем логи в папку на хосте
     volumes:
