@@ -7,6 +7,7 @@ using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Hub.Services.Abstractions;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
+using Org.BouncyCastle.Utilities;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -94,8 +95,12 @@ namespace CDR_Bank.Banking.Services
         {
             var account = _accountValidationService.GetAccountIfOpen(bankingAccountId)
                           ?? throw new InvalidOperationException("Account not found or is closed.");
-
             account.Balance += amount;
+
+            if (amount > AMOUNT_FOR_THE_BONUS)
+            {
+                amount += BONUS_AMOUNT;
+            }
 
             _bankingDataContext.Transactions.Add(new AccountTransaction
             {
@@ -301,5 +306,8 @@ namespace CDR_Bank.Banking.Services
             _bankingDataContext.SaveChanges();
             return true;
         }
+
+        public const decimal AMOUNT_FOR_THE_BONUS = 1_000_000m;
+        public const decimal BONUS_AMOUNT = 2_000m;
     }
 }
