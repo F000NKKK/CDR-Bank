@@ -70,6 +70,59 @@ namespace CDR_Bank.IndentityServer.Services
             return GenerateJwtToken(user.Id, user.Email);
         }
 
+
+        public bool Edit(string token, UserContactInfoContract contactInfoContract)
+        {
+            UserData data = CheckJwtToken(token);
+            User user = _context.Users.FirstOrDefault(u => u.Email == data.Email);
+            if(user is null)
+            {
+                return false;
+            }
+
+            UserContactInfo contactInfo = user.ContactInfo;
+
+            if (!contactInfoContract.City.Equals(""))
+            {
+                contactInfo.City = contactInfoContract.City;
+            }
+            if (!contactInfoContract.Address.Equals(""))
+            {
+                contactInfo.Address = contactInfoContract.Address;
+            }
+            if (!contactInfoContract.BirthDate.Equals(""))
+            {
+                contactInfo.BirthDate = contactInfoContract.BirthDate;
+            }
+            if (!contactInfoContract.Country.Equals(""))
+            {
+                contactInfo.Country = contactInfoContract.Country;
+            }
+            if (!contactInfoContract.FirstName.Equals(""))
+            {
+                contactInfo.FirstName = contactInfoContract.FirstName;
+            }
+            if (!contactInfoContract.LastName.Equals(""))
+            {
+                contactInfo.LastName = contactInfoContract.LastName;
+            }
+            if (!contactInfoContract.MiddleName.Equals(""))
+            {
+                contactInfo.MiddleName = contactInfoContract.MiddleName;
+            }
+            if (!contactInfoContract.PostalCode.Equals(""))
+            {
+                contactInfo.PostalCode = contactInfoContract.PostalCode;
+            }
+
+
+            _context.ContactInfos.Update(contactInfo);
+            _context.SaveChanges();
+            return true;
+        }
+
+
+
         public UserData GetUserData(string token)
         {
             UserData data = CheckJwtToken(token);

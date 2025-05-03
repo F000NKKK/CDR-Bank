@@ -10,4 +10,5 @@ public interface IIndentityService
     UserData GetUserData(string token);
     UserContactInfoContract GetUserContactsData(string token);
     bool ChangePassword(string token, PasswordChange passwordChange);
+    bool Edit(string token, UserContactInfoContract contactInfoContract);
 }
