@@ -29,7 +29,7 @@ namespace CDR_Bank.IndentityServer.Services
 
         private void RegisterServices(ContainerBuilder builder)
         {
-            builder.Register<IndentityService>(ctx => new IndentityService(ctx.Resolve<IdentityDataContext>()))
+            builder.Register<IndentityService>(ctx => new IndentityService(ctx.Resolve<IdentityDataContext>(), _configuration.GetSection("ApiSettings:SecretKey").Value))
                    .As<IIndentityService>()
                    .InstancePerLifetimeScope();
         }
