@@ -5,6 +5,7 @@ using CDR_Bank.DataAccess.Banking.Enums;
 using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
+using System.Security.Principal;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -247,6 +248,8 @@ namespace CDR_Bank.Banking.Services
 
             _bankingDataContext.Transactions.Add(internalTransaction);
 
+            _bankingDataContext.Update(source);
+            _bankingDataContext.Update(dest);
             _bankingDataContext.SaveChanges();
 
             return true;
@@ -266,6 +269,7 @@ namespace CDR_Bank.Banking.Services
 
             account.State = Libs.Banking.Contracts.Enums.AccountState.Closed;
 
+            _bankingDataContext.Update(account);
             _bankingDataContext.SaveChanges();
 
             return true;
@@ -283,7 +287,11 @@ namespace CDR_Bank.Banking.Services
                 .ToList();
 
             foreach (var acc in mainAccounts)
+            {
                 acc.IsMain = false;
+                _bankingDataContext.Update(acc);
+            }
+            _bankingDataContext.SaveChanges();
         }
 
         public Guid CreateAccount(Guid userId, string name, BankAccountType type, decimal? creditLimit = null, bool isMain = false)
