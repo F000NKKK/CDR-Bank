@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CDR-Bank.IdentityServer": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52339;http://localhost:52340"
+    }
+  }
+}
