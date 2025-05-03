@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace CDR_Bank.DataAccess.Identity
 {
