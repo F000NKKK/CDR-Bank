@@ -2,6 +2,7 @@
 using CDR_Bank.DataAccess.Banking;
 using CDR_Bank.DataAccess.Banking.Entities;
 using CDR_Bank.DataAccess.Banking.Enums;
+using CDR_Bank.DataAccess.Identity;
 using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Hub.Services.Abstractions;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
@@ -13,10 +14,11 @@ namespace CDR_Bank.Banking.Services
     {
         private readonly BankingDataContext _bankingDataContext;
         private readonly IAccountValidationService _accountValidationService;
+        private readonly IdentityDataContext _identityDataContext;
 
-
-        public BankingService(BankingDataContext bankingDataContext, IAccountValidationService accountValidationService)
+        public BankingService(BankingDataContext bankingDataContext, IdentityDataContext identityDataContext, IAccountValidationService accountValidationService)
         {
+            _identityDataContext = identityDataContext;
             _bankingDataContext = bankingDataContext;
             _accountValidationService = accountValidationService;
         }
@@ -82,7 +84,6 @@ namespace CDR_Bank.Banking.Services
                     Type = (CDR_Bank.Libs.Banking.Contracts.Enums.BankAccountType)(int)s.Type,
                     Id = s.Id,
                     IsMain = s.IsMain,
-                    TelephoneNumber = s.TelephoneNumber,
                     UserId = s.UserId
                 }).ToList(),
                 TotalCount = totalCount
@@ -128,8 +129,10 @@ namespace CDR_Bank.Banking.Services
             if (!_accountValidationService.CanTransfer(sender, amount))
                 return false;
 
+            var recipientUserId = _identityDataContext.ContactInfos.FirstOrDefault(f => f.PhoneNumber == recipientTelephone).UserId;
+
             var recipient = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.TelephoneNumber == recipientTelephone
+                .FirstOrDefault(a => a.UserId == recipientUserId
                                      && a.State == AccountState.Open
                                      && a.IsMain);
             if (recipient == null)
@@ -243,7 +246,6 @@ namespace CDR_Bank.Banking.Services
                 IsMain = account?.IsMain ?? false,
                 Name = account?.Name ?? string.Empty,
                 State = (CDR_Bank.Libs.Banking.Contracts.Enums.AccountState)(int)(account?.State ?? AccountState.Closed),
-                TelephoneNumber = account?.TelephoneNumber ?? string.Empty,
                 Type = (CDR_Bank.Libs.Banking.Contracts.Enums.BankAccountType)(int)(account?.Type ?? BankAccountType.Savings),
                 UserId = account?.UserId ?? Guid.Empty,
                 AccountNumber = account?.AccountNumber ?? string.Empty
