@@ -138,7 +138,6 @@ namespace CDR_Bank.IndentityServer.Services
             if (contactInfo is null)
             {
                 user.ContactInfo = new UserContactInfo();
-                _context.Users.Update(user);
                 _context.ContactInfos.Update(user.ContactInfo);
                 _context.SaveChanges();
                 contactInfo = user.ContactInfo;
