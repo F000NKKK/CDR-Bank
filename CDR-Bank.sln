@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Libs.API", "CDR-Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Libs.Hub.Contracts", "CDR-Bank.Libs.Hub.Contracts\CDR-Bank.Libs.Hub.Contracts.csproj", "{A33703C1-7160-46F1-920C-4E80F53BE401}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Hub.Services", "CDR-Bank.Hub.Services\CDR-Bank.Hub.Services.csproj", "{43191210-8958-4780-8AD1-4497AB306EA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{A33703C1-7160-46F1-920C-4E80F53BE401}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A33703C1-7160-46F1-920C-4E80F53BE401}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A33703C1-7160-46F1-920C-4E80F53BE401}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43191210-8958-4780-8AD1-4497AB306EA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43191210-8958-4780-8AD1-4497AB306EA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43191210-8958-4780-8AD1-4497AB306EA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43191210-8958-4780-8AD1-4497AB306EA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
