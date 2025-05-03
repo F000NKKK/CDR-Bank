@@ -8,4 +8,5 @@ public interface IIndentityService
     string Registration(UserLoginData loginData);
     UserData GetUserData(string token);
     UserContactInfoContract GetUserContactsData(string token);
+    bool ChangePassword(string token, PasswordChange passwordChange);
 }
