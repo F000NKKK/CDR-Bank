@@ -8,12 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CDR-Bank.Banking.Services\CDR-Bank.Banking.Services.csproj" />
+    <ProjectReference Include="..\CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj" />
     <ProjectReference Include="..\CDR-Bank.Libs.API\CDR-Bank.Libs.API.csproj" />
     <ProjectReference Include="..\CDR-Bank.Libs.Banking.Contracts\CDR-Bank.Libs.Banking.Contracts.csproj" />
   </ItemGroup>
