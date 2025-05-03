@@ -26,7 +26,9 @@ namespace CDR_Bank.DataAccess.Identity
 
                 var context = new IdentityDataContext(optionsBuilder.Options);
 
-                return context.ApplyMigrationsIfNotEf();
+                context.Database.Migrate();
+
+                return context;
             })
             .AsSelf()
             .As<DbContext>()
