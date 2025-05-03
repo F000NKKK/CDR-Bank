@@ -91,9 +91,10 @@ namespace CDR_Bank.IndentityServer.Services
             {
                 contactInfo.Address = contactInfoContract.Address;
             }
-            
-            contactInfo.BirthDate = contactInfoContract.BirthDate;
-            
+            if (contactInfoContract.BirthDate is not null)
+            {
+                contactInfo.BirthDate = (DateTime)contactInfoContract.BirthDate;
+            }
             if (!string.IsNullOrWhiteSpace(contactInfoContract.Country))
             {
                 contactInfo.Country = contactInfoContract.Country;
