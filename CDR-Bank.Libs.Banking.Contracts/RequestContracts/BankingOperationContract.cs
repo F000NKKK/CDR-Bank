@@ -1,6 +1,6 @@
-﻿using CDR_Bank.Libs.Hub.Contracts.Abstractions;
+﻿using CDR_Bank.Libs.Hub.Contracts.Request.Abstractions;
 
-namespace CDR_Bank.Libs.Hub.Contracts
+namespace CDR_Bank.Libs.Hub.Contracts.Request
 {
     public class BankingOperationContract : BaseBankingContract
     {

@@ -1,4 +1,4 @@
-﻿namespace CDR_Bank.Libs.Hub.Contracts
+﻿namespace CDR_Bank.Libs.Hub.Contracts.Request
 {
     public class BankingTransferContract : BankingOperationContract
     {

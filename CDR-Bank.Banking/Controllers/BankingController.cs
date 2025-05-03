@@ -1,6 +1,6 @@
 using CDR_Bank.Banking.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
-using CDR_Bank.Libs.Hub.Contracts;
+using CDR_Bank.Libs.Hub.Contracts.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDR_Bank.Banking.Controllers
