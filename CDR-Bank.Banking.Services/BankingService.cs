@@ -4,6 +4,7 @@ using CDR_Bank.DataAccess.Banking.Entities;
 using CDR_Bank.DataAccess.Banking.Enums;
 using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Libs.Hub.Contracts.RequestContracts;
+using System.Security.Principal;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -63,15 +64,30 @@ namespace CDR_Bank.Banking.Services
             };
 
             _bankingDataContext.Transactions.Add(transaction);
-            _bankingDataContext.SaveChanges();
+
+            ApplyDataBaseTransaction();
+        }
+
+        private BankAccount? GetAccountIfOpen(Guid bankingAccountId)
+        {
+            return _bankingDataContext.BankAccounts
+                .FirstOrDefault(a => a.Id == bankingAccountId && a.State == AccountState.Open);
         }
 
         public bool Transfer(Guid bankingAccountId, string recipientTelephoneNumber, decimal amount)
         {
-            var senderAccount = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == bankingAccountId && a.State == AccountState.Open);
-
+            var senderAccount = GetAccountIfOpen(bankingAccountId);
             if (senderAccount == null || senderAccount.Balance < amount)
+                return false;
+
+            if (senderAccount == null)
+                return false;
+
+            var maxAvailable = senderAccount.Type == BankAccountType.Credit
+            ? senderAccount.Balance + (senderAccount.CreditLimit ?? 0)
+                : senderAccount.Balance;
+
+            if (maxAvailable < amount)
                 return false;
 
             var recipientAccount = _bankingDataContext.BankAccounts
@@ -107,28 +123,24 @@ namespace CDR_Bank.Banking.Services
 
             _bankingDataContext.Transactions.Add(recipientTransaction);
             _bankingDataContext.Transactions.Add(senderTransaction);
-            using var transaction = _bankingDataContext.Database.BeginTransaction();
 
-            try
-            {
-                _bankingDataContext.SaveChanges();
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+            ApplyDataBaseTransaction();
 
             return true;
         }
 
         public bool Withdraw(Guid bankingAccountId, decimal amount)
         {
-            var account = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == bankingAccountId && a.State == AccountState.Open);
+            var account = GetAccountIfOpen(bankingAccountId);
 
-            if (account == null || account.Balance < amount)
+            if (account == null)
+                return false;
+
+            var maxAvailable = account.Type == BankAccountType.Credit
+                ? account.Balance + (account.CreditLimit ?? 0)
+                : account.Balance;
+
+            if (maxAvailable < amount)
                 return false;
 
             account.Balance -= amount;
@@ -144,17 +156,16 @@ namespace CDR_Bank.Banking.Services
             };
 
             _bankingDataContext.Transactions.Add(transaction);
-            _bankingDataContext.SaveChanges();
+
+            ApplyDataBaseTransaction();
 
             return true;
         }
 
         public bool InternalTransfer(Guid sourceAccountId, Guid destinationAccountId, decimal amount)
         {
-            var source = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == sourceAccountId && a.State == AccountState.Open);
-            var dest = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == destinationAccountId && a.State == AccountState.Open);
+            var source = GetAccountIfOpen(sourceAccountId);
+            var dest = GetAccountIfOpen(destinationAccountId);
 
             if (source == null || dest == null || source.Balance < amount)
                 return false;
@@ -175,31 +186,21 @@ namespace CDR_Bank.Banking.Services
 
             _bankingDataContext.Transactions.Add(internalTransaction);
 
-            using var transaction = _bankingDataContext.Database.BeginTransaction();
-
-            try
-            {
-                _bankingDataContext.SaveChanges();
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+            ApplyDataBaseTransaction();
 
             return true;
         }
         public bool CloseAccount(Guid bankingAccountId)
         {
-            var account = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == bankingAccountId && a.State == AccountState.Open);
+            var account = GetAccountIfOpen(bankingAccountId);
 
             if (account == null)
                 return false;
 
             account.State = AccountState.Closed;
-            _bankingDataContext.SaveChanges();
+
+            ApplyDataBaseTransaction();
+
             return true;
         }
 
@@ -236,20 +237,10 @@ namespace CDR_Bank.Banking.Services
             };
 
             _bankingDataContext.BankAccounts.Add(account);
-            _bankingDataContext.SaveChanges();
+
+            ApplyDataBaseTransaction();
 
             return account.Id;
-        }
-
-        private void ApplyMainAccountFlag(BankAccount account, bool? isMain)
-        {
-            if (isMain.HasValue)
-            {
-                if (isMain.Value && !account.IsMain)
-                    ResetOtherMainAccounts(account.UserId, account.Id);
-
-                account.IsMain = isMain.Value;
-            }
         }
 
         public bool EditAccount(Guid bankingAccountId, string? name, BankAccountType? type, decimal? creditLimit, bool? isMain = null)
@@ -271,8 +262,36 @@ namespace CDR_Bank.Banking.Services
 
             ApplyMainAccountFlag(account, isMain);
 
-            _bankingDataContext.SaveChanges();
+
+            ApplyDataBaseTransaction();
+
             return true;
+        }
+
+        private void ApplyDataBaseTransaction()
+        {
+            using var transaction = _bankingDataContext.Database.BeginTransaction();
+            try
+            {
+                _bankingDataContext.SaveChanges();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        private void ApplyMainAccountFlag(BankAccount account, bool? isMain)
+        {
+            if (isMain.HasValue)
+            {
+                if (isMain.Value && !account.IsMain)
+                    ResetOtherMainAccounts(account.UserId, account.Id);
+
+                account.IsMain = isMain.Value;
+            }
         }
     }
 }
