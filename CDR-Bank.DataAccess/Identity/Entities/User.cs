@@ -9,6 +9,6 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // «один-к-одному»
-        public UserContactInfo? ContactInfo { get; set; }
+        public virtual UserContactInfo? ContactInfo { get; set; } = new UserContactInfo();
     }
 }

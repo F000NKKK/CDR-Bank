@@ -3,8 +3,8 @@ using CDR_Bank.DataAccess.Banking;
 using CDR_Bank.DataAccess.Banking.Entities;
 using CDR_Bank.DataAccess.Banking.Enums;
 using CDR_Bank.DataAccess.Models;
-using CDR_Bank.Libs.Hub.Contracts.RequestContracts;
-using System.Security.Principal;
+using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
+using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -17,7 +17,7 @@ namespace CDR_Bank.Banking.Services
             _bankingDataContext = bankingDataContext;
         }
 
-        public PagedResult<AccountTransaction> GetTransactions(Guid userId, TransactionFilterContract filter)
+        public PagedResult<AccountTransactionContract> GetTransactions(Guid userId, TransactionFilterContract filter)
         {
             var query = _bankingDataContext.Transactions
                 .Where(t => _bankingDataContext.BankAccounts
@@ -36,9 +36,51 @@ namespace CDR_Bank.Banking.Services
                 .Take(filter.PageSize)
                 .ToList();
 
-            return new PagedResult<AccountTransaction>
+            return new PagedResult<AccountTransactionContract>
             {
-                Items = transactions,
+                Items = transactions.Select(s => new AccountTransactionContract()
+                {
+                    Amount = s.Amount,
+                    BankingAccountId = s.BankingAccountId,
+                    CounterpartyAccountId = s.CounterpartyAccountId,
+                    CreatedAt = s.CreatedAt,
+                    Description = s.Description,
+                    Id = s.Id,
+                    Status = (CDR_Bank.Libs.Banking.Contracts.Enums.TransactionStatus)(int)s.Status,
+                    Type = (CDR_Bank.Libs.Banking.Contracts.Enums.TransactionType)(int)s.Type,
+                }).ToList(),
+                TotalCount = totalCount
+            };
+        }
+
+        public PagedResult<BankingAccountContract> GetAccounts(Guid userId, int page, int pageSize)
+        {
+            var query = _bankingDataContext.BankAccounts
+                .Where(a => a.UserId == userId && a.State == AccountState.Open)
+                .OrderBy(a => a.Name);
+
+            var totalCount = query.Count();
+
+            var accounts = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PagedResult<BankingAccountContract>
+            {
+                Items = accounts.Select(s => new BankingAccountContract()
+                {
+                    AccountNumber = s.AccountNumber,
+                    Balance = s.Balance,
+                    CreditLimit = s.CreditLimit,
+                    Name = s.Name,
+                    State = (CDR_Bank.Libs.Banking.Contracts.Enums.AccountState)(int)s.State,
+                    Type = (CDR_Bank.Libs.Banking.Contracts.Enums.BankAccountType)(int)s.Type,
+                    Id = s.Id,
+                    IsMain = s.IsMain,
+                    TelephoneNumber = s.TelephoneNumber,
+                    UserId = s.UserId
+                }).ToList(),
                 TotalCount = totalCount
             };
         }
@@ -68,10 +110,29 @@ namespace CDR_Bank.Banking.Services
             ApplyDataBaseTransaction();
         }
 
-        private BankAccount? GetAccountIfOpen(Guid bankingAccountId)
+        private BankingAccountContract? GetAccountIfOpen(Guid bankingAccountId)
         {
-            return _bankingDataContext.BankAccounts
+            var account = _bankingDataContext.BankAccounts
                 .FirstOrDefault(a => a.Id == bankingAccountId && a.State == AccountState.Open);
+
+            if (account != null)
+            {
+                return new BankingAccountContract()
+                {
+                    AccountNumber = account.AccountNumber,
+                    Balance = account.Balance,
+                    CreditLimit = account.CreditLimit,
+                    Name = account.Name,
+                    State = (CDR_Bank.Libs.Banking.Contracts.Enums.AccountState)(int)account.State,
+                    Type = (CDR_Bank.Libs.Banking.Contracts.Enums.BankAccountType)(int)account.Type,
+                    IsMain = account.IsMain,
+                    TelephoneNumber = account.TelephoneNumber,
+                    UserId = account.UserId,
+                    Id = account.Id
+                };
+            }
+
+            return null;
         }
 
         public bool Transfer(Guid bankingAccountId, string recipientTelephoneNumber, decimal amount)
@@ -83,7 +144,7 @@ namespace CDR_Bank.Banking.Services
             if (senderAccount == null)
                 return false;
 
-            var maxAvailable = senderAccount.Type == BankAccountType.Credit
+            var maxAvailable = senderAccount.Type == Libs.Banking.Contracts.Enums.BankAccountType.Credit
             ? senderAccount.Balance + (senderAccount.CreditLimit ?? 0)
                 : senderAccount.Balance;
 
@@ -136,7 +197,7 @@ namespace CDR_Bank.Banking.Services
             if (account == null)
                 return false;
 
-            var maxAvailable = account.Type == BankAccountType.Credit
+            var maxAvailable = account.Type == Libs.Banking.Contracts.Enums.BankAccountType.Credit
                 ? account.Balance + (account.CreditLimit ?? 0)
                 : account.Balance;
 
@@ -197,14 +258,14 @@ namespace CDR_Bank.Banking.Services
             if (account == null)
                 return false;
 
-            account.State = AccountState.Closed;
+            account.State = Libs.Banking.Contracts.Enums.AccountState.Closed;
 
             ApplyDataBaseTransaction();
 
             return true;
         }
 
-        public BankAccount? GetAccountData(Guid bankingAccountId)
+        public BankingAccountContract? GetAccountData(Guid bankingAccountId)
         {
             return GetAccountIfOpen(bankingAccountId);
         }
@@ -253,7 +314,7 @@ namespace CDR_Bank.Banking.Services
                 account.Name = name;
 
             if (type.HasValue)
-                account.Type = type.Value;
+                account.Type = (Libs.Banking.Contracts.Enums.BankAccountType)(int)type.Value;
 
             if (type == BankAccountType.Credit && creditLimit.HasValue)
                 account.CreditLimit = creditLimit;
@@ -281,7 +342,7 @@ namespace CDR_Bank.Banking.Services
             }
         }
 
-        private void ApplyMainAccountFlag(BankAccount account, bool? isMain)
+        private void ApplyMainAccountFlag(BankingAccountContract account, bool? isMain)
         {
             if (isMain.HasValue)
             {

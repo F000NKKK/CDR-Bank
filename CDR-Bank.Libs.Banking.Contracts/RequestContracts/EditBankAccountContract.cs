@@ -1,5 +1,5 @@
-﻿using CDR_Bank.Libs.Banking.Contracts.Enums;
-using CDR_Bank.Libs.Banking.Contracts.RequestContracts.Abstractions;
+﻿using CDR_Bank.Libs.Banking.Contracts.RequestContracts.Abstractions;
+using CDR_Bank.Libs.Banking.Contracts.Enums;
 
 namespace CDR_Bank.Libs.Banking.Contracts.RequestContracts
 {

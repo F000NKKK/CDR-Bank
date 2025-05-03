@@ -112,6 +112,29 @@ namespace CDR_Bank.Hub.Controllers
         }
 
 
+        [HttpPost("edit")]
+        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<TokenResponse> Edit(UserContactInfoContract userContactInfo)
+        {
+            var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Split(' ')[1];
+            }
+            else
+            {
+                return BadRequest("Bad token");
+            }
+            bool result = _identityService.Edit(token, userContactInfo);
+            if (!result)
+            {
+                return BadRequest("Change failed.");
+            }
+            return Ok();
+        }
+
+
 
         [HttpPost("Test")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]

@@ -13,6 +13,6 @@ namespace CDR_Bank.DataAccess.Banking.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? Description { get; set; }
 
-        public BankAccount BankingAccount { get; set; } = null!;
+        public virtual BankAccount BankingAccount { get; set; } = null!;
     }
 }
