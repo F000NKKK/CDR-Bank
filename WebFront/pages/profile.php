@@ -25,8 +25,8 @@ if(!$user) {
                 <div class="card text-center">
                     <div class="card-body">
                         <img src="assets/images/images.png" class="rounded-circle mb-3" alt="Фото профиля">
-                        <h5 class="card-title text-highlight">Иван Иванов</h5>
-                        <p class="card-text">Номер счета: 123456789</p>
+                        <h5 class="card-title text-highlight"><?php echo isset($user['firstName']) ? htmlspecialchars($user['firstName']) : 'fName'; echo isset($user['lastName']) ? htmlspecialchars($user['lastName']) : 'lName'; ?></h5>
+                        <p class="card-text">Телефон: <?php echo isset($user['phone']) ? htmlspecialchars($user['phone']) : '+9-999-999-99-99';?></p>
                         <p class="card-text">Электронная почта: <?php echo isset($user['email']) ? htmlspecialchars($user['email']) : 'Не указана'; ?></p>
                         <p class="card-text">Баланс: <span class="text-highlight">10,000 ₽</span></p>
                         <button class="btn btn-custom">Редактировать профиль</button>

@@ -91,7 +91,7 @@ function registerUser($params) {
         'firstName' => $params['firstName'] ?? '',
         'middleName' => $params['middleName'] ?? '',
         'birthDate' => $params['birthDate'] ?? '',
-        'phone' => $params['phone'] ?? '',
+        'phoneNumber' => $params['phone'] ?? '',
         'country' => $params['country'] ?? '',
         'city' => $params['city'] ?? '',
         'address' => $params['address'] ?? '',
@@ -113,6 +113,10 @@ function registerUser($params) {
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
+    $responseData = json_decode($response, true);
+
+    var_dump($responseData); // Debugging output
+
     if ($httpCode === 200) {
         $responseData = json_decode($response, true);
         if (isset($responseData['token'])) {
@@ -129,7 +133,7 @@ function registerUser($params) {
         }
     }
 
-    return "Registration failed!";
+    return $responseData['message'] ?? "Registration failed!";
 }
 
 /**
