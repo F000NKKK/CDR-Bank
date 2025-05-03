@@ -10,10 +10,12 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj" />
+    <ProjectReference Include="..\CDR-Bank.Libs.Identity.Contracts\CDR-Bank.Libs.Identity.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

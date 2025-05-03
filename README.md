@@ -99,7 +99,7 @@
 ```
 
 
-## Регистрация /account/register
+## Регистрация /account/registration
 ### Тело запроса:
 ```json
 {

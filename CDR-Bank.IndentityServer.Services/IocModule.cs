@@ -1,4 +1,6 @@
 ﻿using Autofac;
+using CDR_Bank.DataAccess.Identity;
+using CDR_Bank.IndentityServer.Services.Abstractions;
 using Microsoft.Extensions.Configuration;
 
 namespace CDR_Bank.IndentityServer.Services
@@ -27,8 +29,8 @@ namespace CDR_Bank.IndentityServer.Services
 
         private void RegisterServices(ContainerBuilder builder)
         {
-            builder.RegisterType<UserService>()
-                   .As<IUserService>()
+            builder.Register<IndentityService>(ctx => new IndentityService(ctx.Resolve<IdentityDataContext>()))
+                   .As<IIndentityService>()
                    .InstancePerLifetimeScope();
         }
 
