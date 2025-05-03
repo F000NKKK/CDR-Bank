@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="ResponseContracts\" />
+    <Folder Include="ResponseContracts\" />
   </ItemGroup>
 
 </Project>
