@@ -21,7 +21,7 @@ namespace CDR_Bank.DataAccess.Banking
                 e.HasIndex(a => a.AccountNumber).IsUnique();
                 e.HasIndex(a => a.UserId);
                 e.HasIndex(a => a.TelephoneNumber);
-                e.HasIndex(a => new { a.UserId, a.IsMain }).IsUnique();
+                e.HasIndex(a => a.IsMain );
 
                 e.Property(a => a.Type).HasConversion<string>();
                 e.Property(a => a.State).HasConversion<string>();
