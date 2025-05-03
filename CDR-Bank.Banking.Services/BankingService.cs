@@ -206,8 +206,7 @@ namespace CDR_Bank.Banking.Services
 
         public BankAccount? GetAccountData(Guid bankingAccountId)
         {
-            return _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == bankingAccountId);
+            return GetAccountIfOpen(bankingAccountId);
         }
 
         private void ResetOtherMainAccounts(Guid userId, Guid? excludeAccountId = null)
@@ -245,8 +244,7 @@ namespace CDR_Bank.Banking.Services
 
         public bool EditAccount(Guid bankingAccountId, string? name, BankAccountType? type, decimal? creditLimit, bool? isMain = null)
         {
-            var account = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == bankingAccountId);
+            var account = GetAccountIfOpen(bankingAccountId);
 
             if (account == null)
                 return false;
