@@ -111,26 +111,14 @@ namespace CDR_Bank.Banking.Services
             _bankingDataContext.SaveChanges();
         }
 
-        private BankingAccountContract? GetAccountIfOpen(Guid bankingAccountId)
+        private BankAccount? GetAccountIfOpen(Guid bankingAccountId)
         {
             var account = _bankingDataContext.BankAccounts
                 .FirstOrDefault(a => a.Id == bankingAccountId && a.State == AccountState.Open);
 
             if (account != null)
             {
-                return new BankingAccountContract()
-                {
-                    AccountNumber = account.AccountNumber,
-                    Balance = account.Balance,
-                    CreditLimit = account.CreditLimit,
-                    Name = account.Name,
-                    State = (CDR_Bank.Libs.Banking.Contracts.Enums.AccountState)(int)account.State,
-                    Type = (CDR_Bank.Libs.Banking.Contracts.Enums.BankAccountType)(int)account.Type,
-                    IsMain = account.IsMain,
-                    TelephoneNumber = account.TelephoneNumber,
-                    UserId = account.UserId,
-                    Id = account.Id
-                };
+                return account;
             }
 
             return null;
@@ -145,7 +133,7 @@ namespace CDR_Bank.Banking.Services
             if (senderAccount == null)
                 return false;
 
-            var maxAvailable = senderAccount.Type == Libs.Banking.Contracts.Enums.BankAccountType.Credit
+            var maxAvailable = senderAccount.Type == BankAccountType.Credit
             ? senderAccount.Balance + (senderAccount.CreditLimit ?? 0)
                 : senderAccount.Balance;
 
@@ -198,7 +186,7 @@ namespace CDR_Bank.Banking.Services
             if (account == null)
                 return false;
 
-            var maxAvailable = account.Type == Libs.Banking.Contracts.Enums.BankAccountType.Credit
+            var maxAvailable = account.Type == BankAccountType.Credit
                 ? account.Balance + (account.CreditLimit ?? 0)
                 : account.Balance;
 
@@ -267,7 +255,7 @@ namespace CDR_Bank.Banking.Services
             if (account == null)
                 return false;
 
-            account.State = Libs.Banking.Contracts.Enums.AccountState.Closed;
+            account.State = AccountState.Closed;
 
             _bankingDataContext.Update(account);
             _bankingDataContext.SaveChanges();
@@ -277,7 +265,21 @@ namespace CDR_Bank.Banking.Services
 
         public BankingAccountContract? GetAccountData(Guid bankingAccountId)
         {
-            return GetAccountIfOpen(bankingAccountId);
+            var account = GetAccountIfOpen(bankingAccountId);
+
+            return new BankingAccountContract()
+            {
+                Balance = account?.Balance ?? 0m,
+                CreditLimit = account?.CreditLimit,
+                Id = account?.Id ?? Guid.Empty,
+                IsMain = account?.IsMain ?? false,
+                Name = account?.Name ?? string.Empty,
+                State = (CDR_Bank.Libs.Banking.Contracts.Enums.AccountState)(int)(account?.State ?? AccountState.Closed),
+                TelephoneNumber = account?.TelephoneNumber ?? string.Empty,
+                Type = (CDR_Bank.Libs.Banking.Contracts.Enums.BankAccountType)(int)(account?.Type ?? BankAccountType.Savings),
+                UserId = account?.UserId ?? Guid.Empty,
+                AccountNumber = account?.AccountNumber ?? string.Empty
+            };
         }
 
         private void ResetOtherMainAccounts(Guid userId, Guid? excludeAccountId = null)
@@ -328,7 +330,7 @@ namespace CDR_Bank.Banking.Services
                 account.Name = name;
 
             if (type.HasValue)
-                account.Type = (Libs.Banking.Contracts.Enums.BankAccountType)(int)type.Value;
+                account.Type = type.Value;
 
             if (type == BankAccountType.Credit && creditLimit.HasValue)
                 account.CreditLimit = creditLimit;
@@ -340,7 +342,7 @@ namespace CDR_Bank.Banking.Services
             return true;
         }
 
-        private void ApplyMainAccountFlag(BankingAccountContract account, bool? isMain)
+        private void ApplyMainAccountFlag(BankAccount account, bool? isMain)
         {
             if (isMain.HasValue)
             {
