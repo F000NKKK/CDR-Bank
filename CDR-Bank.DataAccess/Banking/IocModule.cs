@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 
 namespace CDR_Bank.DataAccess.Banking
 {
@@ -26,10 +25,14 @@ namespace CDR_Bank.DataAccess.Banking
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
-                return new BankingDataContext(optionsBuilder.Options);
+                var context = new BankingDataContext(optionsBuilder.Options);
+
+                return context.ApplyMigrationsIfNotEf();
             })
             .AsSelf()
+            .As<DbContext>()
             .SingleInstance();
         }
+
     }
 }

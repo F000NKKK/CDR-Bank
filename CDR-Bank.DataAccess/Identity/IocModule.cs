@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient; // для MySqlException
 
 namespace CDR_Bank.DataAccess.Identity
 {
@@ -25,9 +24,12 @@ namespace CDR_Bank.DataAccess.Identity
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
-                return new IdentityDataContext(optionsBuilder.Options);
+                var context = new IdentityDataContext(optionsBuilder.Options);
+
+                return context.ApplyMigrationsIfNotEf();
             })
             .AsSelf()
+            .As<DbContext>()
             .SingleInstance();
         }
     }
