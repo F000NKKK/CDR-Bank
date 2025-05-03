@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 namespace CDR_Bank.DataAccess.Banking
 {
@@ -14,11 +15,10 @@ namespace CDR_Bank.DataAccess.Banking
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.Register(c =>
+            builder.Register<BankingDataContext>(c =>
             {
                 var optionsBuilder = new DbContextOptionsBuilder<BankingDataContext>();
 
-                // Обновляем для новой версии MySql.EntityFrameworkCore
                 optionsBuilder.UseMySQL(
                     _connectionString,
                     mySqlOptions =>
@@ -26,11 +26,21 @@ namespace CDR_Bank.DataAccess.Banking
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
-                // Регистрация контекста в DI контейнере
-                return new BankingDataContext(optionsBuilder.Options);
+                var context = new BankingDataContext(optionsBuilder.Options);
+
+                try
+                {
+                    context.Database.Migrate();
+                }
+                catch (MySqlException ex) when (ex.Message.Contains("Parameter '@result'"))
+                {
+                    Console.WriteLine("Warning: migrations could not capture LOCK, we skip: " + ex.Message);
+                }
+
+                return context;
             })
-            .AsSelf() // Регистрация самого контекста
-            .SingleInstance(); // Синглтон, т.к. DataContext обычно используется в скоупе
+            .AsSelf()
+            .SingleInstance();
         }
     }
 }

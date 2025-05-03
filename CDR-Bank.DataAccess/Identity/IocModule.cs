@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient; // для MySqlException
 
 namespace CDR_Bank.DataAccess.Identity
 {
@@ -17,8 +18,6 @@ namespace CDR_Bank.DataAccess.Identity
             builder.Register(c =>
             {
                 var optionsBuilder = new DbContextOptionsBuilder<IdentityDataContext>();
-
-                // Обновляем для новой версии MySql.EntityFrameworkCore
                 optionsBuilder.UseMySQL(
                     _connectionString,
                     mySqlOptions =>
@@ -26,11 +25,21 @@ namespace CDR_Bank.DataAccess.Identity
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
-                // Регистрация контекста в DI контейнере
-                return new IdentityDataContext(optionsBuilder.Options);
+                var context = new IdentityDataContext(optionsBuilder.Options);
+
+                try
+                {
+                    context.Database.Migrate();
+                }
+                catch (MySqlException ex) when (ex.Message.Contains("Parameter '@result'"))
+                {
+                    Console.WriteLine("Warning: migrations could not capture LOCK, we skip: " + ex.Message);
+                }
+
+                return context;
             })
             .AsSelf()
-            .InstancePerLifetimeScope();
+            .SingleInstance();
         }
     }
 }
