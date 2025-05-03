@@ -5,7 +5,6 @@ using CDR_Bank.DataAccess.Banking.Enums;
 using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
-using System.Security.Principal;
 
 namespace CDR_Bank.Banking.Services
 {
