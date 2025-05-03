@@ -43,6 +43,26 @@ namespace CDR_Bank.Banking.Services
             };
         }
 
+        public PagedResult<BankAccount> GetAccounts(Guid userId, int page, int pageSize)
+        {
+            var query = _bankingDataContext.BankAccounts
+                .Where(a => a.UserId == userId && a.State == AccountState.Open)
+                .OrderBy(a => a.Name);
+
+            var totalCount = query.Count();
+
+            var accounts = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PagedResult<BankAccount>
+            {
+                Items = accounts,
+                TotalCount = totalCount
+            };
+        }
+
         public void Replenish(Guid bankingAccountId, decimal amount)
         {
             var account = _bankingDataContext.BankAccounts

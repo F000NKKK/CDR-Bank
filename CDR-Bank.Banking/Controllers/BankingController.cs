@@ -1,9 +1,11 @@
 using CDR_Bank.Banking.Services.Abstractions;
+using CDR_Bank.DataAccess.Banking.Entities;
 using CDR_Bank.Libs.API.Abstractions;
 using CDR_Bank.Libs.API.Contracts;
 using CDR_Bank.Libs.Banking.Contracts.Enums;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
+using CDR_Bank.Libs.Hub.Contracts.RequestContracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDR_Bank.Banking.Controllers;
@@ -91,7 +93,7 @@ public class BankingController : AController
     /// <summary>
     /// Close an existing account.
     /// </summary>
-    [HttpPost("bank-account/close")]
+    [HttpPatch("bank-account/close")]
     public IActionResult Close([FromBody] BankingOperationContract request)
     {
         if (request == null)
@@ -128,28 +130,78 @@ public class BankingController : AController
     /// <summary>
     /// Get data for a specific account.
     /// </summary>
-    [HttpPost("bank-account/get-data")]
+    [HttpGet("bank-account/get-data")]
     [ProducesResponseType(typeof(BankingAccountContract), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<BankingAccountContract> GetData([FromBody] BankingOperationContract request)
+    public ActionResult<BankingAccountContract> GetData([FromQuery] string bankingAccountRequest)
     {
-        if (request == null)
-            return BadRequest("Invalid request payload.");
-
-        var account = _bankingService.GetAccountData(request.BankingAccount);
-        if (account == null)
-            return NotFound("Account not found.");
-
-        return Ok(new BankingAccountContract
+        if (bankingAccountRequest == null)
         {
-            AccountNumber = account.AccountNumber,
-            Balance = account.Balance,
-            CreditLimit = account.CreditLimit,
-            Name = account.Name,
-            State = (AccountState)account.State,
-            Type = (BankAccountType)account.Type
-        });
+            return BadRequest("Invalid request.");
+        }
+
+        Guid bankingAccount;
+
+        if (Guid.TryParse(bankingAccountRequest, out bankingAccount))
+        {
+            var account = _bankingService.GetAccountData(bankingAccount);
+
+            if (account == null)
+                return NotFound("Account not found.");
+
+            return Ok(new BankingAccountContract
+            {
+                AccountNumber = account.AccountNumber,
+                Balance = account.Balance,
+                CreditLimit = account.CreditLimit,
+                Name = account.Name,
+                State = (AccountState)account.State,
+                Type = (BankAccountType)account.Type,
+                IsMain = account.IsMain,
+                TelephoneNumber = account.TelephoneNumber,
+                UserId = account.UserId,
+                Id = account.Id
+            });
+        }
+        else
+        {
+            return BadRequest("Invalid request.");
+        }
+    }
+
+    [HttpGet("transactions")]
+    [ProducesResponseType(typeof(PagedResult<AccountTransaction>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<PagedResult<AccountTransaction>> GetTransactions([FromQuery] Guid userId, [FromQuery] TransactionFilterContract filter)
+    {
+        if (userId == Guid.Empty)
+            return BadRequest("Invalid user ID.");
+
+        if (filter.Page <= 0 || filter.PageSize <= 0)
+            return BadRequest("Invalid pagination parameters.");
+
+        var result = _bankingService.GetTransactions(userId, filter);
+
+        return Ok(result);
+    }
+
+    [HttpGet("bank-accounts")]
+    [ProducesResponseType(typeof(PagedResult<BankAccount>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<PagedResult<BankAccount>> GetAccounts([FromQuery] Guid userId, [FromQuery] int page, [FromQuery] int pageSize)
+    {
+        if (userId == Guid.Empty)
+            return BadRequest("Invalid user ID.");
+
+        if (page <= 0 || pageSize <= 0)
+            return BadRequest("Invalid pagination parameters.");
+
+        var result = _bankingService.GetAccounts(userId, page, pageSize);
+
+        return Ok(result);
     }
 
     private static bool IsValidOpenRequest(OpenBankAccountContract request, Guid userId) =>

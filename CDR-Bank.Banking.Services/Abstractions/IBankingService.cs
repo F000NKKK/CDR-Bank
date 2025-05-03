@@ -16,5 +16,6 @@ namespace CDR_Bank.Banking.Services.Abstractions
         bool Transfer(Guid bankingAccount, string recipientTelephoneNumber, decimal amount);
         bool Withdraw(Guid bankingAccount, decimal amount);
         PagedResult<AccountTransaction> GetTransactions(Guid userId, TransactionFilterContract filter);
+        PagedResult<BankAccount> GetAccounts(Guid userId, int page, int pageSize);
     }
 }

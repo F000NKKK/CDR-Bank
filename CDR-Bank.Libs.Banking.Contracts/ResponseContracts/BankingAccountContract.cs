@@ -1,5 +1,4 @@
 ﻿using CDR_Bank.Libs.Banking.Contracts.Enums;
-using CDR_Bank.Libs.Banking.Contracts.Enums;
 
 namespace CDR_Bank.Libs.Banking.Contracts.ResponseContracts
 {
@@ -8,6 +7,8 @@ namespace CDR_Bank.Libs.Banking.Contracts.ResponseContracts
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; } // from Identity
         public string AccountNumber { get; set; } = Guid.NewGuid().ToString();
+        public string TelephoneNumber { get; set; } = string.Empty;
+        public bool IsMain { get; set; }
         public string Name { get; set; } = string.Empty;
         public BankAccountType Type { get; set; }
         public AccountState State { get; set; } = AccountState.Open;
