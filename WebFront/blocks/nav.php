@@ -1,3 +1,10 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
+    $_SESSION['page'] = $_POST['page'];
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+?>
 <!-- Навигационное меню с темной темой -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
@@ -68,20 +75,6 @@
                         <form method="post" style="display:inline;">
                             <button class="nav-link <?php if (isset($_SESSION['page']) && $_SESSION['page'] === 'register') { echo 'active'; } ?> btn btn-link" type="submit" name="page" value="register">Register</button>
                         </form>
-                    </li>
-                <?php endif; ?>
-            </ul>
-                        </form>
-                    </li>
-            </ul>
-
-            <?php
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
-                $_SESSION['page'] = $_POST['page'];
-                header('Location: ' . $_SERVER['PHP_SELF']);
-                exit;
-            }
-            ?>
         </div>
     </div>
 </nav>
