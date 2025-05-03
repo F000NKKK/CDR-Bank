@@ -11,15 +11,12 @@ namespace CDR_Bank.DataAccess
         {
             if (IsEfToolRunning())
             {
-                Console.WriteLine("Skipping the migration application, as it was launched via dotnet ef.");
                 logger?.LogInformation("Skipping the migration application, as it was launched via dotnet ef.");
                 return context;
             }
 
             try
             {
-
-                Console.WriteLine("Application of migrations...");
                 logger?.LogInformation("Application of migrations...");
                 context.Database.Migrate();
                 logger?.LogInformation("Migrations have been applied successfully.");
