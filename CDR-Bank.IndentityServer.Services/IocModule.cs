@@ -34,7 +34,6 @@ namespace CDR_Bank.IndentityServer.Services
                    .InstancePerLifetimeScope();
         }
 
-
         private void RegisterModules(ContainerBuilder builder)
         {
             var connectionString = _configuration.GetConnectionString("IdentityDb");
