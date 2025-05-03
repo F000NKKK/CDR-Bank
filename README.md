@@ -5,10 +5,9 @@
 ### Заголовки:
 * bearerToken: SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
-    "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16", 
+    "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16",
     "amount": 100
 }
 ```
@@ -16,7 +15,6 @@
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
     "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16",
@@ -24,18 +22,15 @@
     "amount": 100
 }
 ```
-
 ## Перевод со счёта на счёт /banking/bank-account/transfer
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
   "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16"
 }
 ```
-
 ## Снятие: /banking/withdraw
 ### Заголовки:
 * bearerToken: SALKJlkjfsakljflkjasASf8u32kalsf
@@ -47,15 +42,10 @@
 }
 ```
 
-
-
-
-
 ## Открытие дебетового счёта /banking/bank-account/open/debit
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
   "name": "",
@@ -63,12 +53,10 @@
 }
 ```
 
-
 ## Открытие кредетового счёта /banking/bank-account/open/credit
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
   "name": "",
@@ -76,15 +64,13 @@
   "limit": 20000
 }
 ```
-
 ## Закрытие счёта /banking/bank-account/close
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
-    "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16"
+  "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16"
 }
 ```
 
@@ -92,20 +78,17 @@
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
-    "{имя параметра}": "",
-    ...
+  "{имя параметра}": "",
+  ...
 }
 ```
-
 
 ## Получение данных по счётам /banking/bank-account/get-data
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
 ### Тело запроса:
-
 ```json
 {
   "bankingAccount": "446a2b43-bc7c-41bd-95c4-06bea3e7fd16"
@@ -113,4 +96,21 @@
 ```
 
 
+## Регистрация /account/register
+### Тело запроса:
+```json
+{
+  "recipientTelephoneNumber": 89994528712,
+  "password": "(в base64 или хэш предпочтительней хэш)"
+}
+```
 
+## Получение токена /account/get-token без тела запроса
+### Заголовки:
+* recipientTelephoneNumber: 89994528712,
+* password: 1234
+
+
+## Получение данных по аккаунту клиента /account/get-user
+### Заголовки:
+* bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
