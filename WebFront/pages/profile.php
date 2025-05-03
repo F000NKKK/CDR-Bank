@@ -5,11 +5,9 @@ if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
     echo "<script>window.location.href = '/';</script>";
     exit();
 }
-
 if (isset($_COOKIE['token'])) {
     $user = getUserProfile($_COOKIE['token']);
 } else {
-    getToken();
     echo "<script>window.location.href = '/';</script>";
     exit();
 }
@@ -17,16 +15,17 @@ if (isset($_COOKIE['token'])) {
 if(!$user) {
     echo "<script>alert('Ошибка: {Error: API cant work!}');</script>";
 }
-
+// var_dump($user);
 ?>
 <div class="container mt-5">
+    <div class="text-center mb-4">
         <div class="row">
             <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-body">
                         <img src="assets/images/images.png" class="rounded-circle mb-3" alt="Фото профиля">
-                        <h5 class="card-title text-highlight"><?php echo isset($user['firstName']) ? htmlspecialchars($user['firstName']) : 'fName'; echo isset($user['lastName']) ? htmlspecialchars($user['lastName']) : 'lName'; ?></h5>
-                        <p class="card-text">Телефон: <?php echo isset($user['phone']) ? htmlspecialchars($user['phone']) : '+9-999-999-99-99';?></p>
+                        <h5 class="card-title text-highlight"><?php echo isset($user['firstName']) ? htmlspecialchars($user['firstName']) : 'fName'; echo " "; echo isset($user['lastName']) ? htmlspecialchars($user['lastName']) : 'lName'; ?></h5>
+                        <p class="card-text">Телефон: <?php echo isset($user['phoneNumber']) ? htmlspecialchars($user['phoneNumber']) : '+9-999-999-99-99';?></p>
                         <p class="card-text">Электронная почта: <?php echo isset($user['email']) ? htmlspecialchars($user['email']) : 'Не указана'; ?></p>
                         <p class="card-text">Баланс: <span class="text-highlight">10,000 ₽</span></p>
                         <button class="btn btn-custom">Редактировать профиль</button>
@@ -68,7 +67,70 @@ if(!$user) {
             </div>
         </div>
     </div>
+    <!-- Форма редактирования профиля -->
+    <div id="editProfileForm" class="action-form card p-4 my-5" style="display: none;">
+        <h5 class="mb-3">Редактировать профиль</h5>
+        <form method="post" action="#">
+            <div class="form-group">
+            <label for="lastName">Фамилия</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Введите фамилию" value="<?php echo htmlspecialchars($user['lastName'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="firstName">Имя</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Введите имя" value="<?php echo htmlspecialchars($user['firstName'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="middleName">Отчество</label>
+            <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Введите отчество" value="<?php echo htmlspecialchars($user['middleName'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="birthDate">Дата рождения</label>
+            <input type="date" class="form-control" id="birthDate" name="birthDate" value="<?php echo isset($user['birthDate']) ? htmlspecialchars(date('Y-m-d', strtotime($user['birthDate']))) : ''; ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="country">Страна</label>
+            <input type="text" class="form-control" id="country" name="country" placeholder="Введите страну" value="<?php echo htmlspecialchars($user['country'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="city">Город</label>
+            <input type="text" class="form-control" id="city" name="city" placeholder="Введите город" value="<?php echo htmlspecialchars($user['city'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="address">Адрес</label>
+            <input type="text" class="form-control" id="address" name="address" placeholder="Введите адрес" value="<?php echo htmlspecialchars($user['address'] ?? ''); ?>" required>
+            </div>
+            <div class="form-group">
+            <label for="postalCode">Почтовый индекс</label>
+            <input type="text" class="form-control" id="postalCode" name="postalCode" placeholder="Введите почтовый индекс" value="<?php echo htmlspecialchars($user['postalCode'] ?? ''); ?>" required>
+            </div>
+            <button type="submit" class="btn btn-warning mt-3" name="updateProfile">Сохранить изменения</button>
+            <?php
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['updateProfile'])) {
+            $updatedData = [
+                'lastName' => $_POST['lastName'] ?? '',
+                'firstName' => $_POST['firstName'] ?? '',
+                'middleName' => $_POST['middleName'] ?? '',
+                'birthDate' => $_POST['birthDate'] ?? '',
+                'country' => $_POST['country'] ?? '',
+                'city' => $_POST['city'] ?? '',
+                'address' => $_POST['address'] ?? '',
+                'postalCode' => $_POST['postalCode'] ?? ''
+            ];
+
+            $response = updateUserProfile($updatedData, $_COOKIE['token']);
+
+            if ($response) {
+                echo "<script>alert('Профиль успешно обновлен!'); window.location.reload();</script>";
+            } else {
+                echo "<script>alert('Ошибка обновления профиля: " . htmlspecialchars($response['message']) . "');</script>";
+            }
+            echo "<script>window.location.href = '/';</script>";
+            }
+            ?>
+        </form>
+    </div>
 </div>
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-12 text-center">
@@ -172,4 +234,16 @@ if(!$user) {
         forms.forEach(form => form.style.display = 'none');
         document.getElementById(formId).style.display = 'block';
     }
+    function hideForm(formId) {
+            document.getElementById(formId).style.display = 'none';
+        }
+
+        document.querySelector('.btn.btn-custom').addEventListener('click', function () {
+            const editProfileForm = document.getElementById('editProfileForm');
+            if (editProfileForm.style.display === 'none' || editProfileForm.style.display === '') {
+                showForm('editProfileForm');
+            } else {
+                hideForm('editProfileForm');
+            }
+        });
 </script>

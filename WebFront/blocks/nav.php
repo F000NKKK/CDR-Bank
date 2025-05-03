@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page']) && $_POST['pa
                                 
                                 session_unset();
                                 session_destroy();
-                                
-                                $_SESSION['user_logged_in'] === false;
+                                $_COOKIE['token'] = null;
+                                $_SESSION['user_logged_in'] = false;
                                 $_SESSION['page'] = 'main';
 
                                 // Очистка всех cookies

@@ -5,6 +5,7 @@ using CDR_Bank.DataAccess.Banking.Enums;
 using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
+using System.Security.Principal;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -107,7 +108,7 @@ namespace CDR_Bank.Banking.Services
 
             _bankingDataContext.Transactions.Add(transaction);
 
-            ApplyDataBaseTransaction();
+            _bankingDataContext.SaveChanges();
         }
 
         private BankingAccountContract? GetAccountIfOpen(Guid bankingAccountId)
@@ -185,7 +186,7 @@ namespace CDR_Bank.Banking.Services
             _bankingDataContext.Transactions.Add(recipientTransaction);
             _bankingDataContext.Transactions.Add(senderTransaction);
 
-            ApplyDataBaseTransaction();
+            _bankingDataContext.SaveChanges();
 
             return true;
         }
@@ -217,8 +218,8 @@ namespace CDR_Bank.Banking.Services
             };
 
             _bankingDataContext.Transactions.Add(transaction);
-
-            ApplyDataBaseTransaction();
+            _bankingDataContext.Update(account);
+            _bankingDataContext.SaveChanges();
 
             return true;
         }
@@ -247,10 +248,18 @@ namespace CDR_Bank.Banking.Services
 
             _bankingDataContext.Transactions.Add(internalTransaction);
 
-            ApplyDataBaseTransaction();
+            _bankingDataContext.Update(source);
+            _bankingDataContext.Update(dest);
+            _bankingDataContext.SaveChanges();
 
             return true;
         }
+
+        public decimal GetBalance(Guid userId)
+        {
+            return _bankingDataContext.BankAccounts.Where(w => w.UserId == userId).Sum(s => s.Balance);
+        }
+
         public bool CloseAccount(Guid bankingAccountId)
         {
             var account = GetAccountIfOpen(bankingAccountId);
@@ -260,7 +269,8 @@ namespace CDR_Bank.Banking.Services
 
             account.State = Libs.Banking.Contracts.Enums.AccountState.Closed;
 
-            ApplyDataBaseTransaction();
+            _bankingDataContext.Update(account);
+            _bankingDataContext.SaveChanges();
 
             return true;
         }
@@ -277,7 +287,11 @@ namespace CDR_Bank.Banking.Services
                 .ToList();
 
             foreach (var acc in mainAccounts)
+            {
                 acc.IsMain = false;
+                _bankingDataContext.Update(acc);
+            }
+            _bankingDataContext.SaveChanges();
         }
 
         public Guid CreateAccount(Guid userId, string name, BankAccountType type, decimal? creditLimit = null, bool isMain = false)
@@ -298,7 +312,7 @@ namespace CDR_Bank.Banking.Services
 
             _bankingDataContext.BankAccounts.Add(account);
 
-            ApplyDataBaseTransaction();
+            _bankingDataContext.SaveChanges();
 
             return account.Id;
         }
@@ -321,25 +335,9 @@ namespace CDR_Bank.Banking.Services
 
             ApplyMainAccountFlag(account, isMain);
 
-
-            ApplyDataBaseTransaction();
+            _bankingDataContext.SaveChanges();
 
             return true;
-        }
-
-        private void ApplyDataBaseTransaction()
-        {
-            using var transaction = _bankingDataContext.Database.BeginTransaction();
-            try
-            {
-                _bankingDataContext.SaveChanges();
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
         }
 
         private void ApplyMainAccountFlag(BankingAccountContract account, bool? isMain)

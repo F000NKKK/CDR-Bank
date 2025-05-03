@@ -3,7 +3,6 @@ using CDR_Bank.Libs.API.Abstractions;
 using CDR_Bank.Libs.API.Contracts;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
-using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDR_Bank.Banking.Controllers;
@@ -18,6 +17,17 @@ public class BankingController : AController
     {
         _bankingService = bankingService ?? throw new ArgumentNullException(nameof(bankingService));
     }
+
+    [HttpGet("balance")]
+    [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
+    public ActionResult<decimal> GetBalance()
+    {
+        var userData = GetUserDataFromContext();
+
+        var balance = _bankingService.GetBalance(userData!.Id);
+        return Ok(balance);
+    }
+
 
     [HttpPost("replenish")]
     public IActionResult Replenish([FromBody] BankingOperationContract request)

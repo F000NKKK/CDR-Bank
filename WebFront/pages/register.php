@@ -115,10 +115,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit" class="btn btn-warning w-100">Зарегистрироваться</button>
             </form>
             <?php if (!empty($errorMessage)): ?>
-                <div id="errorMessage" class="text-danger mt-3"><?= htmlspecialchars($errorMessage) ?></div>
+                <div id="errorMessage" class="alert alert-danger mt-3" role="alert">
+                    <?= htmlspecialchars($errorMessage) ?>
+                </div>
             <?php elseif (!empty($successMessage)): ?>
-                <div id="successMessage" class="text-success mt-3"><?= htmlspecialchars($successMessage) ?></div>
-                <?php $_SESSION['page'] = "profile"?>
+                <div id="successMessage" class="alert alert-success mt-3" role="alert">
+                    <?= htmlspecialchars($successMessage) ?>
+                </div>
+                <?php $_SESSION['page'] = "profile"; ?>
                 <script>
                     setTimeout(function() {
                         window.location.href = '/';
