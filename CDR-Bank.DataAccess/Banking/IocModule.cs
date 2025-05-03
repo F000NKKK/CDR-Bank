@@ -26,18 +26,7 @@ namespace CDR_Bank.DataAccess.Banking
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
-                var context = new BankingDataContext(optionsBuilder.Options);
-
-                try
-                {
-                    context.Database.Migrate();
-                }
-                catch (MySqlException ex) when (ex.Message.Contains("Parameter '@result'"))
-                {
-                    Console.WriteLine("Warning: migrations could not capture LOCK, we skip: " + ex.Message);
-                }
-
-                return context;
+                return new BankingDataContext(optionsBuilder.Options);
             })
             .AsSelf()
             .SingleInstance();
