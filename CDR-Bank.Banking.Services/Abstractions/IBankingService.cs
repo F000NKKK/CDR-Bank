@@ -1,5 +1,7 @@
 ﻿using CDR_Bank.DataAccess.Banking.Entities;
 using CDR_Bank.DataAccess.Banking.Enums;
+using CDR_Bank.DataAccess.Models;
+using CDR_Bank.Libs.Hub.Contracts.RequestContracts;
 
 namespace CDR_Bank.Banking.Services.Abstractions
 {
@@ -13,5 +15,6 @@ namespace CDR_Bank.Banking.Services.Abstractions
         void Replenish(Guid bankingAccount, decimal amount);
         bool Transfer(Guid bankingAccount, string recipientTelephoneNumber, decimal amount);
         bool Withdraw(Guid bankingAccount, decimal amount);
+        PagedResult<AccountTransaction> GetTransactions(Guid userId, TransactionFilterContract filter);
     }
 }
