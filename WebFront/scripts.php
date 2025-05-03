@@ -1,10 +1,20 @@
 <?php
 session_start();
-// $_SESSION['user_logged_in'] = false;
-// $_SESSION['page'] = 'main';
+// Start the session to manage user authentication and session data
+
+// Define the host URL for the API
 $host = "https://192.168.77.130:52339";
+// Determine the current page from the session or default to 'main'
 $page = isset($_SESSION['page']) ? $_SESSION['page'] : 'main';
 
+/**
+ * Authenticate the user with the provided email and password.
+ * If successful, store the token in the session and set a cookie.
+ *
+ * @param string $email
+ * @param string $password
+ * @return bool
+ */
 function authenticateUser($email, $password) {
     global $host;
     $authUrl = $host . "/account/login";
@@ -31,6 +41,7 @@ function authenticateUser($email, $password) {
     if ($httpCode === 200) {
         $responseData = json_decode($response, true);
         if (isset($responseData['token'])) {
+            // Store the token in the session and set a cookie
             $_SESSION['token'] = $responseData['token'];
             $_SESSION['user_logged_in'] = true;
             setcookie('token', $responseData['token'], time() + 3600, "/");
@@ -42,8 +53,14 @@ function authenticateUser($email, $password) {
     return false;
 }
 
+/**
+ * Retrieve the authentication token from the session or cookie.
+ *
+ * @return string|null
+ */
 function getToken() {
     if (isset($_SESSION['token'])) {
+        setcookie('token', $_SESSION['token'], time() + 3600, "/");
         return $_SESSION['token'];
     } elseif (isset($_COOKIE['token'])) {
         return $_COOKIE['token'];
@@ -52,6 +69,14 @@ function getToken() {
     return null;
 }
 
+/**
+ * Register a new user with the provided email and password.
+ * If successful, store the token and user data in the session.
+ *
+ * @param string $email
+ * @param string $password
+ * @return string
+ */
 function registerUser($email, $password) {
     global $host;
     $registerUrl = $host . "/account/registration";
@@ -79,6 +104,7 @@ function registerUser($email, $password) {
     if ($httpCode === 200) {
         $responseData = json_decode($response, true);
         if (isset($responseData['token'])) {
+            // Store the token and user data in the session
             $_SESSION['token'] = $responseData['token'];
             $_SESSION['user_logged_in'] = true;
             setcookie('token', $responseData['token'], time() + 3600, "/");
@@ -94,6 +120,11 @@ function registerUser($email, $password) {
     return "Registration failed!";
 }
 
+/**
+ * Fetch the user's banking profile using the API.
+ *
+ * @return array|string
+ */
 function getProfileBanking() {
     global $host;
     $token = getToken();
@@ -123,6 +154,13 @@ function getProfileBanking() {
     return "Failed to fetch profile banking!";
 }
 
+/**
+ * Deposit money into the specified account.
+ *
+ * @param string $accountPhone
+ * @param float $amount
+ * @return string
+ */
 function pushMoney($accountPhone, $amount) {
     global $host;
     $token = getToken();
@@ -159,6 +197,13 @@ function pushMoney($accountPhone, $amount) {
     return "Failed to deposit money!";
 }
 
+/**
+ * Withdraw money from the specified account.
+ *
+ * @param string $accountPhone
+ * @param float $amount
+ * @return string
+ */
 function dropMoney($accountPhone, $amount) {
     global $host;
     $token = getToken();
@@ -195,6 +240,13 @@ function dropMoney($accountPhone, $amount) {
     return "Failed to withdraw money!";
 }
 
+/**
+ * Transfer money to another user's account.
+ *
+ * @param string $recipientPhone
+ * @param float $amount
+ * @return string
+ */
 function payMoney($recipientPhone, $amount) {
     global $host;
     $token = getToken();
@@ -231,14 +283,15 @@ function payMoney($recipientPhone, $amount) {
     return "Failed to transfer money!";
 }
 
+// Handle POST requests for user authentication
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
     if (authenticateUser($email, $password)) {
-        // echo "Authentication successful!";
+        // Authentication successful
     } else {
-        // echo "Authentication failed!";
+        // Authentication failed
     }
 }
 ?>
