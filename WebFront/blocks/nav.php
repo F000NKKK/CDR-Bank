@@ -51,9 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
                             if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page']) && $_POST['page'] === 'logout') {
                                 // Очистка данных сессии
                                 
-                                $_SESSION['user_logged_in'] === false;
                                 session_unset();
                                 session_destroy();
+                                
+                                session_start();
+
+                                $_SESSION['user_logged_in'] === false;
+                                $_SESSION['page'] = 'main';
 
                                 // Очистка всех cookies
                                 if (isset($_SERVER['HTTP_COOKIE'])) {
