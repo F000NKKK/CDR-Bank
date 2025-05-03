@@ -314,23 +314,5 @@ namespace CDR_Bank.Banking.Services
             _bankingDataContext.SaveChanges();
             return true;
         }
-
-        private void ApplyMainAccountFlag(BankAccount account, bool? isMain)
-        {
-            if (isMain.HasValue)
-            {
-                if (isMain.Value && !account.IsMain)
-                    ResetOtherMainAccounts(account.UserId, account.Id);
-
-                account.IsMain = isMain.Value;
-            }
-        }
-        private bool HasNegativeCreditBalance(Guid userId)
-        {
-            return _bankingDataContext.BankAccounts
-                .Any(a => a.UserId == userId && a.Type == BankAccountType.Credit && a.Balance <= -20_000m);
-        }
-
-        private const decimal MAX_WITHDRAW_AMOUNT = 30_000m;
     }
 }
