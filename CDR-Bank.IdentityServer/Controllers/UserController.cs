@@ -51,7 +51,7 @@ namespace CDR_Bank.Hub.Controllers
         }
         
         
-        [HttpPost("get-user")]
+        [HttpGet("get-user")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<TokenResponse> GetUser()
@@ -61,7 +61,7 @@ namespace CDR_Bank.Hub.Controllers
             return Ok(result);
         }
         
-        [HttpPost("get-user-contact-info")]
+        [HttpGet("get-user-contact-info")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<TokenResponse> GetUserContactInfo()
@@ -72,7 +72,7 @@ namespace CDR_Bank.Hub.Controllers
         }
         
         
-        [HttpPost("get-user-contact-info")]
+        [HttpPost("change-password")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<TokenResponse>ChangePassword (PasswordChange passwordChange)

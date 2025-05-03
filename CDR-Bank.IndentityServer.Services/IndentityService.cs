@@ -23,7 +23,7 @@ namespace CDR_Bank.IndentityServer.Services
         public string Login(UserLoginData loginData)
         {
             var bayts = Encoding.UTF8.GetBytes(loginData.Password);
-            var passwordHash = SHA3_512.HashData(bayts);
+            var passwordHash = SHA512.HashData(bayts);
             var user = _context.Users.FirstOrDefault(u => (u.Email == loginData.Email)&&(u.PasswordHash==passwordHash.ToString()));
             if (user is null)
             {
@@ -41,7 +41,7 @@ namespace CDR_Bank.IndentityServer.Services
             }
 
             var bayts = Encoding.UTF8.GetBytes(loginData.Password);
-            var passwordHash = SHA3_512.HashData(bayts);
+            var passwordHash = SHA512.HashData(bayts);
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -80,14 +80,14 @@ namespace CDR_Bank.IndentityServer.Services
         {
             UserData data = CheckJwtToken(token);
             var bayts = Encoding.UTF8.GetBytes(passwordChange.OldPassword);
-            var passwordHash = SHA3_512.HashData(bayts);
+            var passwordHash = SHA512.HashData(bayts);
             User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id)&&(u.PasswordHash==passwordHash.ToString()));
             if (user is null)
             {
                 return false;
             }
             bayts = Encoding.UTF8.GetBytes(passwordChange.NewPassword);
-            passwordHash = SHA3_512.HashData(bayts);
+            passwordHash = SHA512.HashData(bayts);
             user.PasswordHash = passwordHash.ToString();
             _context.Users.Update(user);
             return true;
