@@ -28,7 +28,7 @@ namespace CDR_Bank.IndentityServer.Services
             var user = _context.Users.FirstOrDefault(u => (u.Email == loginData.Email)&&(u.PasswordHash==passwordHash.ToString()));
             if (user is null)
             {
-                return "";
+                return string.Empty;
             }
             return GenerateJwtToken(user.Id, user.Email);
         }
