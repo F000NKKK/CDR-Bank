@@ -1,6 +1,7 @@
 using CDR_Bank.IndentityServer.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
 using CDR_Bank.Libs.Identity.Contracts.RequestContracts.Abstractions;
+using CDR_Bank.Libs.Identity.Contracts.ResponseContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,16 +31,18 @@ namespace CDR_Bank.Hub.Controllers
         /// <param name="request">The request containing account identifier and amount to replenish.</param>
         /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
         [HttpPost("registration")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Registration([FromBody] UserLoginData request)
+        public ActionResult<TokenResponse> Registration([FromBody] UserLoginData request)
         {
-            string token = _identityService.Registration(request);
-            if (token.Equals(""))
-            {
+            if (request == null)
                 return BadRequest("Invalid request payload.");
-            }
-            return Ok(new { token });
+
+            var token = _identityService.Registration(request);
+            if (string.IsNullOrEmpty(token))
+                return BadRequest("Registration failed.");
+
+            return Ok(new TokenResponse { Token = token });
         }
 
         /// <summary>
@@ -48,19 +51,18 @@ namespace CDR_Bank.Hub.Controllers
         /// <param name="request">The request containing account identifier and amount to withdraw.</param>
         /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
         [HttpPost("login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
-        public IActionResult Withdraw([FromBody] UserLoginData request)
+        public ActionResult<TokenResponse> Login([FromBody] UserLoginData request)
         {
-            string token = _identityService.Login(request);
-            if (token.Equals(""))
-            {
+            if (request == null)
                 return BadRequest("Invalid request payload.");
-            }
-            return Ok(new { token });
-        }
 
-        
+            var token = _identityService.Login(request);
+            if (string.IsNullOrEmpty(token))
+                return BadRequest("Login failed.");
+
+            return Ok(new TokenResponse { Token = token });
+        }
     }
 }

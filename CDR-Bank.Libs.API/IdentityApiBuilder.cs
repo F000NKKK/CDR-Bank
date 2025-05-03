@@ -16,8 +16,7 @@ namespace CDR_Bank.Libs.API
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            app.UseApiCore()
-               .UseApiSwagger();
+            app.UseApiSwagger();
 
             app.UseHttpsRedirection();
             app.MapControllers();

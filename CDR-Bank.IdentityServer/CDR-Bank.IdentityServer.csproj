@@ -5,38 +5,16 @@
     <RootNamespace>CDR_Bank.IdentityServer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj" />
     <ProjectReference Include="..\CDR-Bank.IndentityServer.Services\CDR-Bank.IndentityServer.Services.csproj" />
     <ProjectReference Include="..\CDR-Bank.Libs.API\CDR-Bank.Libs.API.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\F000NK\source\repos\CDR-Bank\CDR-Bank.IdentityServer\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="C:\Users\F000NK\source\repos\CDR-Bank\CDR-Bank.IdentityServer\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
   </ItemGroup>
 
 </Project>
