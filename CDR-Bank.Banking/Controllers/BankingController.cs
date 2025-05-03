@@ -76,35 +76,15 @@ public class BankingController : AController
     /// <summary>
     /// Open a new debit account.
     /// </summary>
-    [HttpPost("bank-account/open/debit")]
-    public IActionResult OpenDebit([FromBody] OpenBankAccountContract request)
+    [HttpPost("bank-account/open")]
+    public IActionResult OpenBankAccount([FromBody] OpenBankAccountContract request)
     {
         var userData = GetUserDataFromContext();
 
         if (!IsValidOpenRequest(request, userData!.Id))
             return BadRequest("Invalid request payload.");
 
-        var accountId = _bankingService.OpenDebitAccount(userData!.Id, request.Name, request.IsMain);
-        return Ok(new { accountId });
-    }
-
-    /// <summary>
-    /// Open a new credit account with limit.
-    /// </summary>
-    [HttpPost("bank-account/open/credit")]
-    public IActionResult OpenCredit([FromBody] OpenBankAccountContract request)
-    {
-        var userData = GetUserDataFromContext();
-
-        if (!IsValidOpenRequest(request, userData!.Id) || !request.CreditLimit.HasValue)
-            return BadRequest("Invalid request payload.");
-
-        var accountId = _bankingService.OpenCreditAccount(
-            userData.Id,
-            request.Name,
-            request.CreditLimit.Value,
-            request.IsMain);
-
+        var accountId = _bankingService.CreateAccount(userData!.Id, request.Name, (CDR_Bank.DataAccess.Banking.Enums.BankAccountType)(int)request.Type, request.CreditLimit, request.IsMain);
         return Ok(new { accountId });
     }
 

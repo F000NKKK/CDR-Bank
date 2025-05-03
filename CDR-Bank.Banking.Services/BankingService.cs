@@ -156,7 +156,7 @@ namespace CDR_Bank.Banking.Services
                 acc.IsMain = false;
         }
 
-        private Guid CreateAccount(Guid userId, string name, BankAccountType type, decimal? creditLimit = null, bool isMain = false)
+        public Guid CreateAccount(Guid userId, string name, BankAccountType type, decimal? creditLimit = null, bool isMain = false)
         {
             if (isMain)
                 ResetOtherMainAccounts(userId);
@@ -188,12 +188,6 @@ namespace CDR_Bank.Banking.Services
                 account.IsMain = isMain.Value;
             }
         }
-
-        public Guid OpenDebitAccount(Guid userId, string name, bool isMain = false)
-            => CreateAccount(userId, name, BankAccountType.Debit, null, isMain);
-
-        public Guid OpenCreditAccount(Guid userId, string name, decimal limit, bool isMain = false)
-            => CreateAccount(userId, name, BankAccountType.Credit, limit, isMain);
 
         public bool EditAccount(Guid bankingAccountId, string? name, BankAccountType? type, decimal? creditLimit, bool? isMain = null)
         {
