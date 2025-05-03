@@ -19,6 +19,7 @@ public class BankingController : AController
     }
 
     [HttpGet("balance")]
+    [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
     public ActionResult<decimal> GetBalance()
     {
         var userData = GetUserDataFromContext();
