@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Net;
 
 namespace CDR_Bank.Libs.API.Middlewares
 {
@@ -34,6 +33,7 @@ namespace CDR_Bank.Libs.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+#if !DEBUG
             var path = context.Request.Path.Value;
 
             if (string.IsNullOrWhiteSpace(path)
@@ -101,7 +101,7 @@ namespace CDR_Bank.Libs.API.Middlewares
                 await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthorizationServiceUnavailable, StatusCodes.Status503ServiceUnavailable);
                 return;
             }
-
+#endif
             await _next(context);
         }
 

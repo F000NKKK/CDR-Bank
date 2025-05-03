@@ -17,14 +17,16 @@ namespace CDR_Bank.DataAccess.Identity
             builder.Register(c =>
             {
                 var optionsBuilder = new DbContextOptionsBuilder<IdentityDataContext>();
-                optionsBuilder.UseMySql(
+
+                // Обновляем для новой версии MySql.EntityFrameworkCore
+                optionsBuilder.UseMySQL(
                     _connectionString,
-                    new MySqlServerVersion(new Version(8, 0, 36)),
                     mySqlOptions =>
                     {
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
+                // Регистрация контекста в DI контейнере
                 return new IdentityDataContext(optionsBuilder.Options);
             })
             .AsSelf()

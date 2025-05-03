@@ -1,5 +1,6 @@
 ﻿using CDR_Bank.DataAccess.Identity;
 using Microsoft.EntityFrameworkCore;
+using MySql.EntityFrameworkCore.Extensions;
 
 namespace CDR_Bank.DataAccess
 {
@@ -8,10 +9,7 @@ namespace CDR_Bank.DataAccess
         public void Test()
         {
             var options = new DbContextOptionsBuilder<IdentityDataContext>()
-                .UseMySql(
-                    "server=localhost;database=cd_bank;user=root;password=your_password;",
-                    new MySqlServerVersion(new Version(8, 0, 36)) // <-- Укажи версию своей MySQL
-                )
+                .UseMySQL()
                 .Options;
 
             using var context = new IdentityDataContext(options);

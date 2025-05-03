@@ -17,18 +17,20 @@ namespace CDR_Bank.DataAccess.Banking
             builder.Register(c =>
             {
                 var optionsBuilder = new DbContextOptionsBuilder<BankingDataContext>();
-                optionsBuilder.UseMySql(
+
+                // Обновляем для новой версии MySql.EntityFrameworkCore
+                optionsBuilder.UseMySQL(
                     _connectionString,
-                    new MySqlServerVersion(new Version(8, 0, 36)),
                     mySqlOptions =>
                     {
                         mySqlOptions.EnableRetryOnFailure();
                     });
 
+                // Регистрация контекста в DI контейнере
                 return new BankingDataContext(optionsBuilder.Options);
             })
-            .AsSelf()
-            .InstancePerLifetimeScope();
+            .AsSelf() // Регистрация самого контекста
+            .SingleInstance(); // Синглтон, т.к. DataContext обычно используется в скоупе
         }
     }
 }
