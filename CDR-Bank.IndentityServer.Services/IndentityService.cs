@@ -59,7 +59,7 @@ namespace CDR_Bank.IndentityServer.Services
             userContactInfo.LastName = registrationData.LastName;
             userContactInfo.FirstName = registrationData.FirstName;
             userContactInfo.MiddleName = registrationData.MiddleName;
-            userContactInfo.BirthDate = registrationData.BirthDate;
+            userContactInfo.BirthDate = DateTime.Parse( registrationData.BirthDate);
             _context.Users.Add(user);
             _context.SaveChanges();
             return GenerateJwtToken(user.Id, user.Email);
