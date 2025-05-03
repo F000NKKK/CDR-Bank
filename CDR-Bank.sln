@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Banking", "CDR-Bank.Banking\CDR-Bank.Banking.csproj", "{145201DE-B9BD-4390-BF6D-8E710E6256ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.Banking", "CDR-Bank.Banking\CDR-Bank.Banking.csproj", "{145201DE-B9BD-4390-BF6D-8E710E6256ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Libs.API", "CDR-Bank.Libs.API\CDR-Bank.Libs.API.csproj", "{F4A39C10-C950-4036-882C-60893FAF99C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.Libs.API", "CDR-Bank.Libs.API\CDR-Bank.Libs.API.csproj", "{F4A39C10-C950-4036-882C-60893FAF99C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Libs.Banking.Contracts", "CDR-Bank.Libs.Banking.Contracts\CDR-Bank.Libs.Banking.Contracts.csproj", "{A33703C1-7160-46F1-920C-4E80F53BE401}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.Libs.Banking.Contracts", "CDR-Bank.Libs.Banking.Contracts\CDR-Bank.Libs.Banking.Contracts.csproj", "{A33703C1-7160-46F1-920C-4E80F53BE401}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.Banking.Services", "CDR-Bank.Banking.Services\CDR-Bank.Banking.Services.csproj", "{43191210-8958-4780-8AD1-4497AB306EA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.Banking.Services", "CDR-Bank.Banking.Services\CDR-Bank.Banking.Services.csproj", "{43191210-8958-4780-8AD1-4497AB306EA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.IdentityServer", "CDR-Bank.IdentityServer\CDR-Bank.IdentityServer.csproj", "{3EF02EE4-196E-4ECD-A334-D8E72E3B42B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.IdentityServer", "CDR-Bank.IdentityServer\CDR-Bank.IdentityServer.csproj", "{3EF02EE4-196E-4ECD-A334-D8E72E3B42B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.IndentityServer.Services", "CDR-Bank.IndentityServer.Services\CDR-Bank.IndentityServer.Services.csproj", "{E4EA99E7-0580-41BA-B4F3-E4A5A6B34C09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.IndentityServer.Services", "CDR-Bank.IndentityServer.Services\CDR-Bank.IndentityServer.Services.csproj", "{E4EA99E7-0580-41BA-B4F3-E4A5A6B34C09}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 EndProject
@@ -25,11 +25,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{5C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib's", "Lib's", "{7C2064CF-30C8-496D-B944-9E957F60FD27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.DataAccess", "CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj", "{D3771C9C-D109-4807-9375-E1B62C72DBA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.DataAccess", "CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj", "{D3771C9C-D109-4807-9375-E1B62C72DBA8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{610E9C38-0746-4F00-98CB-1F63C615E508}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.IdentityServer.ApiClient", "CDR-Bank.IdentityServer.ApiClient\CDR-Bank.IdentityServer.ApiClient.csproj", "{783ED1D5-972F-4568-BBEA-71B847132D48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CDR-Bank.IdentityServer.ApiClient", "CDR-Bank.IdentityServer.ApiClient\CDR-Bank.IdentityServer.ApiClient.csproj", "{783ED1D5-972F-4568-BBEA-71B847132D48}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebFront", "WebFront", "{A429BFFB-7572-406B-B938-E83B4948DEA4}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebFront", "WebFront\", "{961257B8-61C2-486F-B781-769F06C94451}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_63385"
+		Debug.AspNetCompiler.PhysicalPath = "WebFront\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63385\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_63385"
+		Release.AspNetCompiler.PhysicalPath = "WebFront\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_63385\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "63385"
+		SlnRelativePath = "WebFront\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +92,10 @@ Global
 		{783ED1D5-972F-4568-BBEA-71B847132D48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{783ED1D5-972F-4568-BBEA-71B847132D48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{783ED1D5-972F-4568-BBEA-71B847132D48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{961257B8-61C2-486F-B781-769F06C94451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{961257B8-61C2-486F-B781-769F06C94451}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{961257B8-61C2-486F-B781-769F06C94451}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{961257B8-61C2-486F-B781-769F06C94451}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +110,7 @@ Global
 		{56AD0357-7175-4953-A4BE-E4F6C8268E22} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{D3771C9C-D109-4807-9375-E1B62C72DBA8} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{783ED1D5-972F-4568-BBEA-71B847132D48} = {610E9C38-0746-4F00-98CB-1F63C615E508}
+		{961257B8-61C2-486F-B781-769F06C94451} = {A429BFFB-7572-406B-B938-E83B4948DEA4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4CE0D61-8C54-408A-B79F-988630A69D72}
