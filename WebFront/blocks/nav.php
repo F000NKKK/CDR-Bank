@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page']) && $_POST['page'] != "logout") {
     $_SESSION['page'] = $_POST['page'];
     echo '<script>window.location.href = "' . $_SERVER['PHP_SELF'] . '";</script>';
     exit;
@@ -54,8 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
                                 session_unset();
                                 session_destroy();
                                 
-                                session_start();
-
                                 $_SESSION['user_logged_in'] === false;
                                 $_SESSION['page'] = 'main';
 
