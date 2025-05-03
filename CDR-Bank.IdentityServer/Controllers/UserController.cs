@@ -42,7 +42,7 @@ namespace CDR_Bank.Hub.Controllers
             if (string.IsNullOrEmpty(token))
                 return BadRequest("Registration failed.");
 
-            return Ok(new TokenResponse { Token = token });
+                return Ok(new TokenResponse { Token = token });
         }
 
         /// <summary>

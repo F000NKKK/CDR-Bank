@@ -11,14 +11,9 @@ public class Program
 
         builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
-        var configuration = builder.Configuration;
-
-        var identityConnectionString = configuration.GetConnectionString("IdentityDb")
-            ?? throw new InvalidOperationException("Connection string 'IdentityDb' is not configured.");
-
-        builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+        builder.Host.ConfigureContainer<ContainerBuilder>((context, containerBuilder) =>
         {
-            containerBuilder.RegisterModule(new IocModule(identityConnectionString));
+            containerBuilder.RegisterModule(new CDR_Bank.IndentityServer.Services.IocModule(builder.Configuration));
         });
 
         var app = IdentityApiBuilder.Build(builder);
