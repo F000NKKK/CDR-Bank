@@ -18,7 +18,7 @@ namespace CDR_Bank.Hub.Controllers
         {
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
         }
-        
+
         [HttpPost("registration")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -31,7 +31,7 @@ namespace CDR_Bank.Hub.Controllers
             if (string.IsNullOrEmpty(token))
                 return BadRequest("Registration failed.");
 
-                return Ok(new TokenResponse { Token = token });
+            return Ok(new TokenResponse { Token = token });
         }
 
 
@@ -49,8 +49,8 @@ namespace CDR_Bank.Hub.Controllers
 
             return Ok(new TokenResponse { Token = token });
         }
-        
-        
+
+
         [HttpGet("get-user")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,7 +60,7 @@ namespace CDR_Bank.Hub.Controllers
             UserData result = _identityService.GetUserData(token);
             return Ok(result);
         }
-        
+
         [HttpGet("get-user-contact-info")]
         [ProducesResponseType(typeof(UserContactInfoContract), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -70,12 +70,12 @@ namespace CDR_Bank.Hub.Controllers
             UserContactInfoContract result = _identityService.GetUserContactsData(token);
             return Ok(result);
         }
-        
-        
+
+
         [HttpPost("change-password")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse>ChangePassword (PasswordChange passwordChange)
+        public ActionResult<TokenResponse> ChangePassword(PasswordChange passwordChange)
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
             bool result = _identityService.ChangePassword(token, passwordChange);
@@ -85,7 +85,18 @@ namespace CDR_Bank.Hub.Controllers
             }
             return Ok();
         }
-        
-        
+
+
+
+        [HttpPost("Test")]
+        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<TokenResponse> Test(TokenResponse token)
+        {
+            _identityService.GetUserContactsData(token.Token);
+            return Ok();
+        }
+
+
     }
 }
