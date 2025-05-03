@@ -118,18 +118,20 @@ namespace CDR_Bank.Banking.Services
             {
                 var account = _bankingDataContext.BankAccounts.Where(a => a.UserId == userId).FirstOrDefault(a => a.Type == BankAccountType.Debit && a.State == AccountState.Open);
 
-                account.Balance += BONUS_AMOUNT;
-
-                _bankingDataContext.Transactions.Add(new AccountTransaction
+                if (account is not null)
                 {
-                    BankingAccountId = account.Id,
-                    Type = TransactionType.Replenish,
-                    Status = TransactionStatus.Completed,
-                    Amount = amount,
-                    CreatedAt = DateTime.UtcNow,
-                    Description = "The deposit bonus is more than one million"
-                });
+                    account.Balance += BONUS_AMOUNT;
 
+                    _bankingDataContext.Transactions.Add(new AccountTransaction
+                    {
+                        BankingAccountId = account.Id,
+                        Type = TransactionType.Replenish,
+                        Status = TransactionStatus.Completed,
+                        Amount = amount,
+                        CreatedAt = DateTime.UtcNow,
+                        Description = "The deposit bonus is more than one million"
+                    });
+                }
             }
         }
 
