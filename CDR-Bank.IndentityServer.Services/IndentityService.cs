@@ -7,6 +7,7 @@ using CDR_Bank.Libs.Identity.Contracts.RequestContracts.Abstractions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using CDR_Bank.Libs.Identity.Contracts.RequestContracts;
 
 
 namespace CDR_Bank.IndentityServer.Services
@@ -32,22 +33,33 @@ namespace CDR_Bank.IndentityServer.Services
             return GenerateJwtToken(user.Id, user.Email);
         }
 
-        public string Registration(UserLoginData loginData)
+        public string Registration(UserRegistrationContract registrationData)
         {
             
-            if (!(_context.Users.FirstOrDefault(u => u.Email == loginData.Email) is null))
+            if (!(_context.Users.FirstOrDefault(u => u.Email == registrationData.Email) is null))
             {
                 return "";
             }
 
-            var bayts = Encoding.UTF8.GetBytes(loginData.Password);
+            var bayts = Encoding.UTF8.GetBytes(registrationData.Password);
             var passwordHash = SHA512.HashData(bayts);
             var user = new User
             {
                 Id = Guid.NewGuid(),
-                Email = loginData.Email,
+                Email = registrationData.Email,
                 PasswordHash = passwordHash.ToString()
             };
+
+            UserContactInfo userContactInfo = user.ContactInfo;
+            userContactInfo.City = registrationData.City;
+            userContactInfo.Country = registrationData.Country;
+            userContactInfo.Address = registrationData.Address;
+            userContactInfo.PhoneNumber = registrationData.PhoneNumber;
+            userContactInfo.PostalCode = registrationData.PostalCode;
+            userContactInfo.LastName = registrationData.LastName;
+            userContactInfo.FirstName = registrationData.FirstName;
+            userContactInfo.MiddleName = registrationData.MiddleName;
+            userContactInfo.BirthDate = registrationData.BirthDate;
             _context.Users.Add(user);
             _context.SaveChanges();
             return GenerateJwtToken(user.Id, user.Email);
@@ -72,6 +84,12 @@ namespace CDR_Bank.IndentityServer.Services
                 City = contactInfo.City,
                 Country = contactInfo.Country,
                 PostalCode = contactInfo.PostalCode,
+                BirthDate = contactInfo.BirthDate,
+                FirstName = contactInfo.FirstName,
+                LastName = contactInfo.LastName,
+                MiddleName = contactInfo.MiddleName,
+                Email = data.Email,
+
             };
             return result;
         }
