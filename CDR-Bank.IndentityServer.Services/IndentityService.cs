@@ -35,7 +35,7 @@ namespace CDR_Bank.IndentityServer.Services
         public string Registration(UserLoginData loginData)
         {
             
-            if (_context.Users.FirstOrDefault(u => u.Email == loginData.Email) is null)
+            if (!(_context.Users.FirstOrDefault(u => u.Email == loginData.Email) is null))
             {
                 return "";
             }
