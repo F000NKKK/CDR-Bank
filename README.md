@@ -11,6 +11,9 @@
     "amount": 100
 }
 ```
+
+
+
 ## Перевод другому клиенту: /banking/transfer
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
@@ -114,3 +117,26 @@
 ## Получение данных по аккаунту клиента /account/get-user
 ### Заголовки:
 * bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
+
+
+## Получение данных по счётам /account/edit
+### Заголовки:
+* bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
+### Тело запроса:
+```json
+{
+  "{имя параметра}": "",
+  ...
+}
+```
+
+## Получение данных по счётам /account/change/password
+### Заголовки:
+* bearerToken:  SALKJlkjfsakljflkjasASf8u32kalsf
+### Тело запроса:
+```json
+{
+  "oldPassword": "",
+  "newPassword": ""
+}
+```
