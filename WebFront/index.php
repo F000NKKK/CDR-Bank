@@ -12,7 +12,7 @@ include 'scripts.php';
 </head>
 <body>
     <header>
-        <?php include 'blocks\nav.php'; ?>
+        <?php include 'blocks/nav.php'; ?>
     </header>
     <main class="container mt-4">
         

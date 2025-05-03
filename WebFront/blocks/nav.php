@@ -1,17 +1,12 @@
 <!-- Навигационное меню с темной темой -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">CDR Bank</a>
         <form method="post" style="display:inline;">
-            <button class="navbar-toggler" type="submit" name="page" value="toggle_nav" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <?php
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page']) && $_POST['page'] === 'toggle_nav') {
-            $_SESSION['nav_toggled'] = !isset($_SESSION['nav_toggled']) || !$_SESSION['nav_toggled'];
-            }
-            ?>
+            <button class="navbar-brand nav-link" type="submit" name="page" value="main">CDR Bank</button>
         </form>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">

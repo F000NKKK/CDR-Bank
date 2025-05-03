@@ -50,3 +50,64 @@
         </div>
     </div>
 </div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h5 class="text-highlight">Actions</h5>
+            <button class="btn btn-custom m-2" onclick="showForm('depositForm')">Пополнить счет</button>
+            <button class="btn btn-custom m-2" onclick="showForm('withdrawForm')">Снять со счета</button>
+            <button class="btn btn-custom m-2" onclick="showForm('transferForm')">Перевести на другой счет</button>
+            <button class="btn btn-custom m-2" onclick="showForm('viewAccountsForm')">Просмотр моих счетов</button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div id="depositForm" class="action-form" style="display: none;">
+                <h5>Пополнить счет</h5>
+                <form>
+                    <div class="form-group">
+                        <label for="depositAmount">Сумма</label>
+                        <input type="number" class="form-control" id="depositAmount" placeholder="Введите сумму">
+                    </div>
+                    <button type="submit" class="btn btn-custom">Пополнить</button>
+                </form>
+            </div>
+            <div id="withdrawForm" class="action-form" style="display: none;">
+                <h5>Снять со счета</h5>
+                <form>
+                    <div class="form-group">
+                        <label for="withdrawAmount">Сумма</label>
+                        <input type="number" class="form-control" id="withdrawAmount" placeholder="Введите сумму">
+                    </div>
+                    <button type="submit" class="btn btn-custom">Снять</button>
+                </form>
+            </div>
+            <div id="transferForm" class="action-form" style="display: none;">
+                <h5>Перевести на другой счет</h5>
+                <form>
+                    <div class="form-group">
+                        <label for="transferAccount">Номер счета</label>
+                        <input type="text" class="form-control" id="transferAccount" placeholder="Введите номер счета">
+                    </div>
+                    <div class="form-group">
+                        <label for="transferAmount">Сумма</label>
+                        <input type="number" class="form-control" id="transferAmount" placeholder="Введите сумму">
+                    </div>
+                    <button type="submit" class="btn btn-custom">Перевести</button>
+                </form>
+            </div>
+            <div id="viewAccountsForm" class="action-form" style="display: none;">
+                <h5>Просмотр моих счетов</h5>
+                <p>Функция "Просмотр моих счетов" пока не реализована.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showForm(formId) {
+        const forms = document.querySelectorAll('.action-form');
+        forms.forEach(form => form.style.display = 'none');
+        document.getElementById(formId).style.display = 'block';
+    }
+</script>
