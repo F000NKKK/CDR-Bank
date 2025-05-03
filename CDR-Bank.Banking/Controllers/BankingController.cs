@@ -1,5 +1,6 @@
 using CDR_Bank.Banking.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
+using CDR_Bank.Libs.API.Contracts;
 using CDR_Bank.Libs.Banking.Contracts.Enums;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
@@ -78,10 +79,12 @@ public class BankingController : AController
     [HttpPost("bank-account/open/debit")]
     public IActionResult OpenDebit([FromBody] OpenBankAccountContract request)
     {
-        if (!IsValidOpenRequest(request))
+        var userData = GetUserDataFromContext();
+
+        if (!IsValidOpenRequest(request, userData!.Id))
             return BadRequest("Invalid request payload.");
 
-        var accountId = _bankingService.OpenDebitAccount(request.UserId, request.Name, request.IsMain);
+        var accountId = _bankingService.OpenDebitAccount(userData!.Id, request.Name, request.IsMain);
         return Ok(new { accountId });
     }
 
@@ -91,11 +94,13 @@ public class BankingController : AController
     [HttpPost("bank-account/open/credit")]
     public IActionResult OpenCredit([FromBody] OpenBankAccountContract request)
     {
-        if (!IsValidOpenRequest(request) || !request.CreditLimit.HasValue)
+        var userData = GetUserDataFromContext();
+
+        if (!IsValidOpenRequest(request, userData!.Id) || !request.CreditLimit.HasValue)
             return BadRequest("Invalid request payload.");
 
         var accountId = _bankingService.OpenCreditAccount(
-            request.UserId,
+            userData.Id,
             request.Name,
             request.CreditLimit.Value,
             request.IsMain);
@@ -167,6 +172,15 @@ public class BankingController : AController
         });
     }
 
-    private static bool IsValidOpenRequest(OpenBankAccountContract request) =>
-        request != null && request.UserId != Guid.Empty && !string.IsNullOrWhiteSpace(request.Name);
+    private static bool IsValidOpenRequest(OpenBankAccountContract request, Guid userId) =>
+        request != null && userId != Guid.Empty && !string.IsNullOrWhiteSpace(request.Name);
+
+    private UserDataContract? GetUserDataFromContext()
+    {
+        if (HttpContext.Items.TryGetValue("UserData", out var userData))
+        {
+            return userData as UserDataContract;
+        }
+        return null;
+    }
 }

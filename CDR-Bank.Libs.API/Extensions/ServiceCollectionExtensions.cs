@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CDR_Bank.Libs.API.Constants;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
@@ -19,16 +20,15 @@ namespace CDR_Bank.Libs.API.Extensions
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "TimeTracking API",
+                    Title = "API",
                     Version = "v1",
-                    Description = "API для отслеживания времени",
+                    Description = "API",
                 });
 
                 options.AddSecurityDefinition("ApiKeyAuth", new OpenApiSecurityScheme
                 {
-                    Description = "Введите ваш токен и нажмите Authorize.\n" +
-                                  "Токен будет помещён в заголовок: x-vp-api-key",
-                    Name = "x-vp-api-key",
+                    Description = "Введите ваш токен и нажмите Authorize.",
+                    Name = AuthorizationConstants.HeaderNames.Authorization,
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "ApiKeyAuth"
@@ -44,7 +44,7 @@ namespace CDR_Bank.Libs.API.Extensions
                             Id = "ApiKeyAuth"
                         },
                         Scheme = "ApiKeyAuth",
-                        Name = "x-vp-api-key",
+                        Name = AuthorizationConstants.HeaderNames.Authorization,
                         In = ParameterLocation.Header,
                     }] = new List<string>()
                 });

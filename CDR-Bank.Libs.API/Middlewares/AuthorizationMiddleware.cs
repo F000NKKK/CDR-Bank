@@ -66,46 +66,49 @@ namespace CDR_Bank.Libs.API.Middlewares
                 return;
             }
 
-            var client = _httpClientFactory.CreateClient();
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationEndpoint);
-            requestMessage.Headers.Add(AuthorizationConstants.HeaderNames.Authorization, $"{AuthorizationConstants.Schemes.Bearer} {token}");
-
-            try
+            using (var client = _httpClientFactory.CreateClient())
             {
-                var response = await client.SendAsync(requestMessage);
 
-                if (response.StatusCode == HttpStatusCode.Unauthorized ||
-                    response.StatusCode == HttpStatusCode.Forbidden)
+                var requestMessage = new HttpRequestMessage(HttpMethod.Get, _authorizationEndpoint);
+                requestMessage.Headers.Add(AuthorizationConstants.HeaderNames.Authorization, $"{AuthorizationConstants.Schemes.Bearer} {token}");
+
+                try
                 {
-                    _logger.LogWarning("External auth returned {StatusCode}", response.StatusCode);
-                    await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.InvalidToken);
-                    return;
+                    var response = await client.SendAsync(requestMessage);
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized ||
+                        response.StatusCode == HttpStatusCode.Forbidden)
+                    {
+                        _logger.LogWarning("External auth returned {StatusCode}", response.StatusCode);
+                        await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.InvalidToken);
+                        return;
+                    }
+
+                    if ((int)response.StatusCode >= 500)
+                    {
+                        _logger.LogError("Auth service error {StatusCode}", response.StatusCode);
+                        await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthorizationServiceUnavailable, StatusCodes.Status503ServiceUnavailable);
+                        return;
+                    }
+
+                    if ((int)response.StatusCode < 200 || (int)response.StatusCode >= 300)
+                    {
+                        _logger.LogWarning("External auth failure.");
+                        await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthenticationFailed);
+                        return;
+                    }
+
+                    var userData = await response.Content.ReadAsStringAsync();
+                    var user = JsonConvert.DeserializeObject<UserDataContract>(userData);
+
+                    context.Items["UserData"] = user;
                 }
-
-                if ((int)response.StatusCode >= 500)
+                catch (Exception ex)
                 {
-                    _logger.LogError("Auth service error {StatusCode}", response.StatusCode);
+                    _logger.LogError(ex, "Authorization request to external endpoint failed.");
                     await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthorizationServiceUnavailable, StatusCodes.Status503ServiceUnavailable);
                     return;
                 }
-
-                if ((int)response.StatusCode < 200 || (int)response.StatusCode >= 300)
-                {
-                    _logger.LogWarning("External auth failure.");
-                    await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthenticationFailed);
-                    return;
-                }
-
-                var userData = await response.Content.ReadAsStringAsync();
-                var user = JsonConvert.DeserializeObject<UserDataContract>(userData);
-
-                context.Items["User"] = user;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Authorization request to external endpoint failed.");
-                await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthorizationServiceUnavailable, StatusCodes.Status503ServiceUnavailable);
-                return;
             }
 #endif
             await _next(context);
