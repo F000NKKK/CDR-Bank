@@ -40,12 +40,17 @@ namespace CDR_Bank.Banking.Services
 
         private void RegisterModules(ContainerBuilder builder)
         {
-            var connectionString = _configuration.GetConnectionString("BankingDb");
-            if (string.IsNullOrWhiteSpace(connectionString))
+            var bankingConnectionString = _configuration.GetConnectionString("BankingDb");
+            var identityConnectionString = _configuration.GetConnectionString("IdentityDb");
+
+            if (string.IsNullOrWhiteSpace(bankingConnectionString))
                 throw new InvalidOperationException("Connection string 'Banking' not found.");
 
-            builder.RegisterModule(new CDR_Bank.DataAccess.Banking.IocModule(connectionString));
-            builder.RegisterModule(new CDR_Bank.DataAccess.Identity.IocModule(connectionString));
+            if (string.IsNullOrWhiteSpace(identityConnectionString))
+                throw new InvalidOperationException("Connection string 'Identity' not found.");
+
+            builder.RegisterModule(new CDR_Bank.DataAccess.Banking.IocModule(bankingConnectionString));
+            builder.RegisterModule(new CDR_Bank.DataAccess.Identity.IocModule(identityConnectionString));
         }
     }
 }
