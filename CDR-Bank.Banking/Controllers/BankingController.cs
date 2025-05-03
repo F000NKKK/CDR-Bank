@@ -1,95 +1,174 @@
 using CDR_Bank.Banking.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
-using CDR_Bank.Libs.Hub.Contracts.Request;
+using CDR_Bank.Libs.Banking.Contracts.Enums;
+using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
+using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDR_Bank.Banking.Controllers
 {
-    /// <summary>
-    /// Controller for handling banking operations such as replenishment, withdrawal, and transfer.
-    /// </summary>
     [ApiController]
     [Route("banking")]
     public class BankingController : AController
     {
         private readonly IBankingService _bankingService;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BankingController"/> class.
-        /// </summary>
-        /// <param name="bankingService">Service for banking operations.</param>
         public BankingController(IBankingService bankingService)
         {
             _bankingService = bankingService ?? throw new ArgumentNullException(nameof(bankingService));
         }
 
-        /// <summary>
-        /// Replenishes the specified banking account with the given amount.
-        /// </summary>
-        /// <param name="request">The request containing account identifier and amount to replenish.</param>
-        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
         [HttpPost("replenish")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Replenish([FromBody] BankingOperationContract request)
         {
             if (request == null || request.Amount <= 0)
-            {
                 return BadRequest("Invalid request payload.");
-            }
 
             _bankingService.Replenish(request.BankingAccount, request.Amount);
             return Ok();
         }
 
-        /// <summary>
-        /// Withdraws the specified amount from the given banking account.
-        /// </summary>
-        /// <param name="request">The request containing account identifier and amount to withdraw.</param>
-        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
         [HttpPost("withdraw")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
         public IActionResult Withdraw([FromBody] BankingOperationContract request)
         {
             if (request == null || request.Amount <= 0)
-            {
                 return BadRequest("Invalid request payload.");
-            }
 
-            var success = _bankingService.Withdraw(request.BankingAccount, request.Amount);
-            if (!success)
-            {
+            if (!_bankingService.Withdraw(request.BankingAccount, request.Amount))
                 return StatusCode(StatusCodes.Status402PaymentRequired, "Insufficient funds.");
-            }
+
+            return Ok();
+        }
+
+        [HttpPost("transfer")]
+        public IActionResult Transfer([FromBody] BankingTransferContract request)
+        {
+            if (request == null || request.Amount <= 0 || string.IsNullOrWhiteSpace(request.RecipientTelephoneNumber))
+                return BadRequest("Invalid request payload.");
+
+            if (!_bankingService.Transfer(request.BankingAccount, request.RecipientTelephoneNumber, request.Amount))
+                return StatusCode(StatusCodes.Status402PaymentRequired, "Transfer failed.");
 
             return Ok();
         }
 
         /// <summary>
-        /// Transfers the specified amount from the sender's account to another client's account by phone number.
+        /// Internal transfer between two accounts of the same client.
         /// </summary>
-        /// <param name="request">The request containing sender account, recipient telephone number, and amount.</param>
-        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
-        [HttpPost("transfer")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
-        public IActionResult Transfer([FromBody] BankingTransferContract request)
+        [HttpPost("bank-account/transfer")]
+        public IActionResult InternalTransfer([FromBody] InternalTransferContract request)
         {
-            if (request == null || request.Amount <= 0 || string.IsNullOrWhiteSpace(request.RecipientTelephoneNumber))
+            if (request == null || request.Amount <= 0)
+                return BadRequest("Invalid request payload.");
+
+            var success = _bankingService.InternalTransfer(
+                request.SourceAccountId,
+                request.DestinationAccountId,
+                request.Amount);
+
+            if (!success)
+                return BadRequest("Transfer failed (insufficient funds or invalid accounts).");
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Open a new debit account.
+        /// </summary>
+        [HttpPost("bank-account/open/debit")]
+        public IActionResult OpenDebit([FromBody] OpenBankAccountContract request)
+        {
+            if (request == null || request.UserId == Guid.Empty || string.IsNullOrWhiteSpace(request.Name))
+                return BadRequest("Invalid request payload.");
+
+            var accountId = _bankingService.OpenDebitAccount(request.UserId, request.Name);
+            return Ok(new { accountId });
+        }
+
+        /// <summary>
+        /// Open a new credit account with limit.
+        /// </summary>
+        [HttpPost("bank-account/open/credit")]
+        public IActionResult OpenCredit([FromBody] OpenBankAccountContract request)
+        {
+            if (request == null || request.UserId == Guid.Empty
+                || string.IsNullOrWhiteSpace(request.Name)
+                || !request.CreditLimit.HasValue)
             {
                 return BadRequest("Invalid request payload.");
             }
 
-            var success = _bankingService.Transfer(request.BankingAccount, request.RecipientTelephoneNumber, request.Amount);
-            if (!success)
-            {
-                return StatusCode(StatusCodes.Status402PaymentRequired, "Transfer failed due to insufficient funds or invalid recipient.");
-            }
+            var accountId = _bankingService.OpenCreditAccount(
+                request.UserId,
+                request.Name,
+                request.CreditLimit.Value);
+
+            return Ok(new { accountId });
+        }
+
+        /// <summary>
+        /// Close an existing account.
+        /// </summary>
+        [HttpPost("bank-account/close")]
+        public IActionResult Close([FromBody] BankingOperationContract request)
+        {
+            if (request == null)
+                return BadRequest("Invalid request payload.");
+
+            if (!_bankingService.CloseAccount(request.BankingAccount))
+                return BadRequest("Account not found or already closed.");
 
             return Ok();
+        }
+
+        /// <summary>
+        /// Edit account parameters (name, type, credit limit).
+        /// </summary>
+        [HttpPost("bank-account/edit")]
+        public IActionResult Edit([FromBody] EditBankAccountContract request)
+        {
+            if (request == null)
+                return BadRequest("Invalid request payload.");
+
+            var success = _bankingService.EditAccount(
+                request.BankingAccount,
+                request.Name,
+                (CDR_Bank.DataAccess.Banking.Enums.BankAccountType)(int)request!.Type!,
+                request.CreditLimit);
+
+            if (!success)
+                return BadRequest("Account not found or invalid parameters.");
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Get data for a specific account.
+        /// </summary>
+        [HttpPost("bank-account/get-data")]
+        [ProducesResponseType(typeof(BankingAccountContract), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<BankingAccountContract> GetData([FromBody] BankingOperationContract request)
+        {
+            if (request == null)
+                return BadRequest("Invalid request payload.");
+
+            var account = _bankingService.GetAccountData(request.BankingAccount);
+            if (account == null)
+                return NotFound("Account not found.");
+
+            var response = new BankingAccountContract
+            {
+                AccountNumber = account.AccountNumber,
+                Balance = account.Balance,
+                CreditLimit = account.CreditLimit,
+                Name = account.Name,
+                State = (AccountState)account.State,
+                Type = (BankAccountType)account.Type
+            };
+
+            return Ok(response);
         }
     }
 }
