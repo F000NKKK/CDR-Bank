@@ -7,7 +7,6 @@ namespace CDR_Bank.Libs.Banking.Contracts.ResponseContracts
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string AccountNumber { get; set; }
-        public string TelephoneNumber { get; set; }
         public bool IsMain { get; set; }
         public string Name { get; set; }
         public BankAccountType Type { get; set; }

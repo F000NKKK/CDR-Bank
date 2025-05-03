@@ -3,6 +3,7 @@ using System;
 using CDR_Bank.DataAccess.Banking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CDR_Bank.DataAccess.Migrations
 {
     [DbContext(typeof(BankingDataContext))]
-    partial class BankingDataContextModelSnapshot : ModelSnapshot
+    [Migration("20250503195822_fix relations")]
+    partial class fixrelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

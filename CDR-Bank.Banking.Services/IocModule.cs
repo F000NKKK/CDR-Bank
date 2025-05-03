@@ -45,6 +45,7 @@ namespace CDR_Bank.Banking.Services
                 throw new InvalidOperationException("Connection string 'Banking' not found.");
 
             builder.RegisterModule(new CDR_Bank.DataAccess.Banking.IocModule(connectionString));
+            builder.RegisterModule(new CDR_Bank.DataAccess.Identity.IocModule(connectionString));
         }
     }
 }
