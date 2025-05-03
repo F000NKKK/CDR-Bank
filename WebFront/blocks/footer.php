@@ -1,1 +1,1 @@
-<p>&copy; <?php echo date("Y"); ?> CDR Bank. All rights reserved.</p>
+<p>&copy; <?php echo date("Y"); ?> CDR Bank. Все права защищены.</p>

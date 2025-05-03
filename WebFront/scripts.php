@@ -1,20 +1,19 @@
 <?php
 session_start();
-// $_SESSION['user_logged_in'] = true; 
+// $_SESSION['user_logged_in'] = false;
+// $_SESSION['page'] = 'main';
+$host = "https://192.168.77.130:52339";
 $page = isset($_SESSION['page']) ? $_SESSION['page'] : 'main';
 
-
 function authenticateUser($email, $password) {
-    // Replace with your API endpoint
-    $authUrl = "https://cdr-bank.voluntas-progresus.tech/api/auth";
+    global $host;
+    $authUrl = $host . "/account/login";
 
-    // Prepare the request payload
     $data = [
         'email' => $email,
         'password' => $password
     ];
 
-    // Initialize cURL
     $ch = curl_init($authUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -22,20 +21,19 @@ function authenticateUser($email, $password) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json'
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    // Execute the request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    // Handle the response
     if ($httpCode === 200) {
         $responseData = json_decode($response, true);
         if (isset($responseData['token'])) {
-            // Save token in session and cookie
             $_SESSION['token'] = $responseData['token'];
-            $_SESSION['user_logged_in'] = true; // Set user_logged_in flag
-            setcookie('token', $responseData['token'], time() + 3600, "/"); // 1-hour expiration
+            $_SESSION['user_logged_in'] = true;
+            setcookie('token', $responseData['token'], time() + 3600, "/");
 
             return true;
         }
@@ -45,7 +43,6 @@ function authenticateUser($email, $password) {
 }
 
 function getToken() {
-    // Check if token exists in session or cookie
     if (isset($_SESSION['token'])) {
         return $_SESSION['token'];
     } elseif (isset($_COOKIE['token'])) {
@@ -56,16 +53,14 @@ function getToken() {
 }
 
 function registerUser($email, $password) {
-    // Replace with your API endpoint
-    $registerUrl = "https://cdr-bank.voluntas-progresus.tech/api/register";
+    global $host;
+    $registerUrl = $host . "/account/registration";
 
-    // Prepare the request payload
     $data = [
         'email' => $email,
         'password' => $password
     ];
 
-    // Initialize cURL
     $ch = curl_init($registerUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -73,22 +68,21 @@ function registerUser($email, $password) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json'
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    // Execute the request
     $response = curl_exec($ch);
+
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    // Handle the response
-    if ($httpCode === 201) { // Assuming 201 Created for successful registration
+    if ($httpCode === 200) {
         $responseData = json_decode($response, true);
         if (isset($responseData['token'])) {
-            // Save token in session and cookie
             $_SESSION['token'] = $responseData['token'];
-            $_SESSION['user_logged_in'] = true; // Set user_logged_in flag
-            setcookie('token', $responseData['token'], time() + 3600, "/"); // 1-hour expiration
+            $_SESSION['user_logged_in'] = true;
+            setcookie('token', $responseData['token'], time() + 3600, "/");
 
-            // Save other user data if needed
             if (isset($responseData['user'])) {
                 $_SESSION['user'] = $responseData['user'];
             }
@@ -101,12 +95,13 @@ function registerUser($email, $password) {
 }
 
 function getProfileBanking() {
+    global $host;
     $token = getToken();
     if (!$token) {
         return "User not authenticated!";
     }
 
-    $url = "https://cdr-bank.voluntas-progresus.tech/api/profileBanking";
+    $url = $host . "/api/profileBanking";
 
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -114,6 +109,8 @@ function getProfileBanking() {
         'Authorization: Bearer ' . $token,
         'Content-Type: application/json'
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -127,12 +124,13 @@ function getProfileBanking() {
 }
 
 function pushMoney($accountPhone, $amount) {
+    global $host;
     $token = getToken();
     if (!$token) {
         return "User not authenticated!";
     }
 
-    $url = "https://cdr-bank.voluntas-progresus.tech/api/pushMoney";
+    $url = $host . "/api/pushMoney";
 
     $data = [
         'accountPhone' => $accountPhone,
@@ -147,6 +145,8 @@ function pushMoney($accountPhone, $amount) {
         'Authorization: Bearer ' . $token,
         'Content-Type: application/json'
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -160,12 +160,13 @@ function pushMoney($accountPhone, $amount) {
 }
 
 function dropMoney($accountPhone, $amount) {
+    global $host;
     $token = getToken();
     if (!$token) {
         return "User not authenticated!";
     }
 
-    $url = "https://cdr-bank.voluntas-progresus.tech/api/dropMoney";
+    $url = $host . "/api/dropMoney";
 
     $data = [
         'accountPhone' => $accountPhone,
@@ -180,6 +181,8 @@ function dropMoney($accountPhone, $amount) {
         'Authorization: Bearer ' . $token,
         'Content-Type: application/json'
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -193,12 +196,13 @@ function dropMoney($accountPhone, $amount) {
 }
 
 function payMoney($recipientPhone, $amount) {
+    global $host;
     $token = getToken();
     if (!$token) {
         return "User not authenticated!";
     }
 
-    $url = "https://cdr-bank.voluntas-progresus.tech/api/payMoney";
+    $url = $host . "/api/payMoney";
 
     $data = [
         'recipientPhone' => $recipientPhone,
@@ -213,6 +217,8 @@ function payMoney($recipientPhone, $amount) {
         'Authorization: Bearer ' . $token,
         'Content-Type: application/json'
     ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

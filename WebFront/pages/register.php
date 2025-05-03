@@ -6,14 +6,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Проверка совпадения паролей
     if ($password !== $confirmPassword) {
-        $errorMessage = "Passwords do not match.";
+        $errorMessage = "Пароли не совпадают.";
     }
     
-    registerUser($email, $password);
+    $mess = registerUser($email, $password);
+    
     if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in']) {
-        $successMessage = "Registration successful! You are now logged in.";
+        $successMessage = $mess;
     } else {
-        $errorMessage = "Registration failed! Please try again.";
+        $errorMessage = $mess;
     }
 }
 ?>
@@ -22,23 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header text-center">
-                    <h4>Registration</h4>
+                    <h4>Регистрация</h4>
                 </div>
                 <div class="card-body">
             <form id="registerForm" method="POST">
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email:</label>
+                    <label for="email" class="form-label">Электронная почта:</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password:</label>
+                    <label for="password" class="form-label">Пароль:</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <div class="mb-3">
-                    <label for="confirmPassword" class="form-label">Confirm Password:</label>
+                    <label for="confirmPassword" class="form-label">Подтвердите пароль:</label>
                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
                 </div>
-                <button type="submit" class="btn btn-warning w-100">Register</button>
+                <button type="submit" class="btn btn-warning w-100">Зарегистрироваться</button>
             </form>
             <?php if (!empty($errorMessage)): ?>
                 <div id="errorMessage" class="text-danger mt-3"><?= htmlspecialchars($errorMessage) ?></div>

@@ -3,16 +3,16 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header text-center">
-                    <h4>Login</h4>
+                    <h4>Вход в аккаунт</h4>
                 </div>
                 <div class="card-body">
                     <form action="" method="POST">
                         <div class="form-group mb-3">
-                            <label for="email">Email</label>
+                            <label for="email">Электронная почта:</label>
                             <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="password">Password</label>
+                            <label for="password">Пароль:</label>
                             <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
                         </div>
                         <button type="submit" class="btn btn-warning w-100">Login</button>
