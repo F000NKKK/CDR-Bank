@@ -1,4 +1,5 @@
 ﻿using CDR_Bank.Libs.API.Constants;
+using CDR_Bank.Libs.API.Filtres;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -25,13 +26,15 @@ namespace CDR_Bank.Libs.API.Extensions
                     Description = "API",
                 });
 
-                options.AddSecurityDefinition("ApiKeyAuth", new OpenApiSecurityScheme
+                options.AddSecurityDefinition(AuthorizationConstants.Schemes.Bearer, new OpenApiSecurityScheme
                 {
-                    Description = "Введите ваш токен и нажмите Authorize.",
+                    Description = "Введите ваш токен с приставкой 'Bearer' и нажмите Authorize.",
                     Name = AuthorizationConstants.HeaderNames.Authorization,
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
-                    Scheme = "ApiKeyAuth"
+                    Scheme = AuthorizationConstants.Schemes.Bearer,
+                    BearerFormat = "JWT",
+                    // Тут мы описываем, что токен должен быть типа Bearer
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -41,13 +44,16 @@ namespace CDR_Bank.Libs.API.Extensions
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "ApiKeyAuth"
+                            Id = AuthorizationConstants.Schemes.Bearer
                         },
-                        Scheme = "ApiKeyAuth",
+                        Scheme = AuthorizationConstants.Schemes.Bearer,
                         Name = AuthorizationConstants.HeaderNames.Authorization,
                         In = ParameterLocation.Header,
                     }] = new List<string>()
                 });
+
+                // Регистрируем фильтр для работы с Bearer токеном
+                options.OperationFilter<AddBearerTokenOperationFilter>();
             });
 
             return services;
