@@ -77,14 +77,14 @@ public class BankingController : AController
     /// Open a new debit account.
     /// </summary>
     [HttpPost("bank-account/open")]
-    public IActionResult OpenDebit([FromBody] OpenBankAccountContract request)
+    public IActionResult OpenBankAccount([FromBody] OpenBankAccountContract request)
     {
         var userData = GetUserDataFromContext();
 
         if (!IsValidOpenRequest(request, userData!.Id))
             return BadRequest("Invalid request payload.");
 
-        var accountId = _bankingService.OpenDebitAccount(userData!.Id, request.Name, request.IsMain);
+        var accountId = _bankingService.CreateAccount(userData!.Id, request.Name, (CDR_Bank.DataAccess.Banking.Enums.BankAccountType)(int)request.Type, request.CreditLimit, request.IsMain);
         return Ok(new { accountId });
     }
 
