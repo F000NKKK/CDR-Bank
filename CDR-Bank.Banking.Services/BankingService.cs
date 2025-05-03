@@ -2,6 +2,8 @@
 using CDR_Bank.DataAccess.Banking;
 using CDR_Bank.DataAccess.Banking.Entities;
 using CDR_Bank.DataAccess.Banking.Enums;
+using CDR_Bank.DataAccess.Models;
+using CDR_Bank.Libs.Hub.Contracts.RequestContracts;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -12,6 +14,32 @@ namespace CDR_Bank.Banking.Services
         public BankingService(BankingDataContext bankingDataContext)
         {
             _bankingDataContext = bankingDataContext;
+        }
+
+        public PagedResult<AccountTransaction> GetTransactions(Guid userId, TransactionFilterContract filter)
+        {
+            var query = _bankingDataContext.Transactions
+                .Where(t => _bankingDataContext.BankAccounts
+                    .Any(a => a.Id == t.BankingAccountId && a.UserId == userId));
+
+            if (filter.BankingAccountId.HasValue)
+            {
+                query = query.Where(t => t.BankingAccountId == filter.BankingAccountId.Value);
+            }
+
+            var totalCount = query.Count();
+
+            var transactions = query
+                .OrderByDescending(t => t.CreatedAt)
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToList();
+
+            return new PagedResult<AccountTransaction>
+            {
+                Items = transactions,
+                TotalCount = totalCount
+            };
         }
 
         public void Replenish(Guid bankingAccountId, decimal amount)
@@ -55,7 +83,18 @@ namespace CDR_Bank.Banking.Services
             senderAccount.Balance -= amount;
             recipientAccount.Balance += amount;
 
-            var transaction = new AccountTransaction
+            var recipientTransaction = new AccountTransaction
+            {
+                BankingAccountId = recipientAccount.Id,
+                CounterpartyAccountId = senderAccount.Id,
+                Type = TransactionType.TransferToUser,
+                Status = TransactionStatus.Completed,
+                Amount = amount,
+                CreatedAt = DateTime.UtcNow,
+                Description = "Received transfer from another user"
+            };
+
+            var senderTransaction = new AccountTransaction
             {
                 BankingAccountId = bankingAccountId,
                 CounterpartyAccountId = recipientAccount.Id,
@@ -66,8 +105,20 @@ namespace CDR_Bank.Banking.Services
                 Description = "Transfer to another user"
             };
 
-            _bankingDataContext.Transactions.Add(transaction);
-            _bankingDataContext.SaveChanges();
+            _bankingDataContext.Transactions.Add(recipientTransaction);
+            _bankingDataContext.Transactions.Add(senderTransaction);
+            using var transaction = _bankingDataContext.Database.BeginTransaction();
+
+            try
+            {
+                _bankingDataContext.SaveChanges();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
 
             return true;
         }
@@ -111,7 +162,7 @@ namespace CDR_Bank.Banking.Services
             source.Balance -= amount;
             dest.Balance += amount;
 
-            var transaction = new AccountTransaction
+            var internalTransaction = new AccountTransaction
             {
                 BankingAccountId = source.Id,
                 CounterpartyAccountId = dest.Id,
@@ -122,8 +173,20 @@ namespace CDR_Bank.Banking.Services
                 Description = "Internal account transfer"
             };
 
-            _bankingDataContext.Transactions.Add(transaction);
-            _bankingDataContext.SaveChanges();
+            _bankingDataContext.Transactions.Add(internalTransaction);
+
+            using var transaction = _bankingDataContext.Database.BeginTransaction();
+
+            try
+            {
+                _bankingDataContext.SaveChanges();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
 
             return true;
         }
