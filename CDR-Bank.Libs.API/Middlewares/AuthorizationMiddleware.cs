@@ -34,7 +34,6 @@ namespace CDR_Bank.Libs.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-#if DEBUG
             var path = context.Request.Path.Value;
 
             if (string.IsNullOrWhiteSpace(path)
@@ -110,7 +109,6 @@ namespace CDR_Bank.Libs.API.Middlewares
                     return;
                 }
             }
-#endif
             await _next(context);
         }
 
