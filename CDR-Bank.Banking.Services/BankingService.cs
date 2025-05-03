@@ -251,6 +251,12 @@ namespace CDR_Bank.Banking.Services
 
             return true;
         }
+
+        public decimal GetBalance(Guid userId)
+        {
+            return _bankingDataContext.BankAccounts.Where(w => w.UserId == userId).Sum(s => s.Balance);
+        }
+
         public bool CloseAccount(Guid bankingAccountId)
         {
             var account = GetAccountIfOpen(bankingAccountId);

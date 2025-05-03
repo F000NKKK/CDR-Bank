@@ -18,5 +18,6 @@ namespace CDR_Bank.Banking.Services.Abstractions
         bool Withdraw(Guid bankingAccount, decimal amount);
         PagedResult<AccountTransactionContract> GetTransactions(Guid userId, TransactionFilterContract filter);
         PagedResult<BankingAccountContract> GetAccounts(Guid userId, int page, int pageSize);
+        decimal GetBalance(Guid userId);
     }
 }
