@@ -2,7 +2,6 @@ using CDR_Bank.IndentityServer.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
 using CDR_Bank.Libs.Identity.Contracts.RequestContracts.Abstractions;
 using CDR_Bank.Libs.Identity.Contracts.ResponseContracts;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDR_Bank.Hub.Controllers
@@ -32,7 +31,7 @@ namespace CDR_Bank.Hub.Controllers
             if (string.IsNullOrEmpty(token))
                 return BadRequest("Registration failed.");
 
-            return Ok(new TokenResponse { Token = token });
+                return Ok(new TokenResponse { Token = token });
         }
 
 

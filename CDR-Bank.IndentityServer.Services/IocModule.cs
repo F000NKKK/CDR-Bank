@@ -36,9 +36,9 @@ namespace CDR_Bank.IndentityServer.Services
 
         private void RegisterModules(ContainerBuilder builder)
         {
-            var connectionString = _configuration.GetConnectionString("BankingDb");
+            var connectionString = _configuration.GetConnectionString("IdentityDb");
             if (string.IsNullOrWhiteSpace(connectionString))
-                throw new InvalidOperationException("Connection string 'Banking' not found.");
+                throw new InvalidOperationException("Connection string 'Identity' not found.");
 
             builder.RegisterModule(new CDR_Bank.DataAccess.Identity.IocModule(connectionString));
         }
