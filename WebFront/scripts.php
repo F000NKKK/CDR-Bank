@@ -4,7 +4,8 @@ session_start();
 // Start the session to manage user authentication and session data
 
 // Define the host URL for the API
-$host = "https://localhost:52339";
+$hostIdentity = "https://localhost:52339";
+$hostBanking = "https://localhost:7297";
 // Determine the current page from the session or default to 'main'
 $page = isset($_SESSION['page']) ? $_SESSION['page'] : 'main';
 
@@ -17,8 +18,8 @@ $page = isset($_SESSION['page']) ? $_SESSION['page'] : 'main';
  * @return bool
  */
 function authenticateUser($email, $password) {
-    global $host;
-    $authUrl = $host . "/account/login";
+    global $hostIdentity;
+    $authUrl = $hostIdentity . "/account/login";
 
     $data = [
         'email' => $email,
@@ -81,8 +82,8 @@ function getToken() {
  * @return string
  */
 function registerUser($params) {
-    global $host;
-    $registerUrl = $host . "/account/registration";
+    global $hostIdentity;
+    $registerUrl = $hostIdentity . "/account/registration";
 
     $data = [
         'email' => $params['email'] ?? '',
@@ -137,9 +138,9 @@ function registerUser($params) {
 }
 
 function updateUserProfile($params, $token) {
-    global $host;
+    global $hostIdentity;
 
-    $url = $host . "/account/edit";
+    $url = $hostIdentity . "/account/edit";
 
     $data = [
         'lastName' => $params['lastName'] ?? '',
@@ -151,7 +152,7 @@ function updateUserProfile($params, $token) {
         'address' => $params['address'] ?? '',
         'postalCode' => $params['postalCode'] ?? ''
     ];
-
+    
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -176,172 +177,9 @@ function updateUserProfile($params, $token) {
     return false;
 }
 
-/**
- * Fetch the user's banking profile using the API.
- *
- * @return array|string
- */
-function getProfileBanking() {
-    global $host;
-    $token = getToken();
-    if (!$token) {
-        return "User not authenticated!";
-    }
-
-    $url = $host . "/api/profileBanking";
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $token,
-        'Content-Type: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200) {
-        return json_decode($response, true);
-    }
-
-    return "Failed to fetch profile banking!";
-}
-
-/**
- * Deposit money into the specified account.
- *
- * @param string $accountPhone
- * @param float $amount
- * @return string
- */
-function pushMoney($accountPhone, $amount) {
-    global $host;
-    $token = getToken();
-    if (!$token) {
-        return "User not authenticated!";
-    }
-
-    $url = $host . "/api/pushMoney";
-
-    $data = [
-        'accountPhone' => $accountPhone,
-        'amount' => $amount
-    ];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $token,
-        'Content-Type: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200) {
-        return "Money successfully deposited!";
-    }
-
-    return "Failed to deposit money!";
-}
-
-/**
- * Withdraw money from the specified account.
- *
- * @param string $accountPhone
- * @param float $amount
- * @return string
- */
-function dropMoney($accountPhone, $amount) {
-    global $host;
-    $token = getToken();
-    if (!$token) {
-        return "User not authenticated!";
-    }
-
-    $url = $host . "/api/dropMoney";
-
-    $data = [
-        'accountPhone' => $accountPhone,
-        'amount' => $amount
-    ];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $token,
-        'Content-Type: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200) {
-        return "Money successfully withdrawn!";
-    }
-
-    return "Failed to withdraw money!";
-}
-
-/**
- * Transfer money to another user's account.
- *
- * @param string $recipientPhone
- * @param float $amount
- * @return string
- */
-function payMoney($recipientPhone, $amount) {
-    global $host;
-    $token = getToken();
-    if (!$token) {
-        return "User not authenticated!";
-    }
-
-    $url = $host . "/api/payMoney";
-
-    $data = [
-        'recipientPhone' => $recipientPhone,
-        'amount' => $amount
-    ];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Authorization: Bearer ' . $token,
-        'Content-Type: application/json'
-    ]);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200) {
-        return "Money successfully transferred!";
-    }
-
-    return "Failed to transfer money!";
-}
-
 function getUserProfile($token) {
-    global $host;
-    $url = $host . "/account/get-user-contact-info";
+    global $hostIdentity;
+    $url = $hostIdentity . "/account/get-user-contact-info";
 
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -363,4 +201,196 @@ function getUserProfile($token) {
     return false;
 }
 
+function createAccount($params, $token) {
+    global $hostBanking;
+    $url = $hostBanking . "/banking/bank-account/open";
+
+    $data = [
+        'name' => $params['name'] ?? '',
+        'type' => $params['type'] ?? '',
+        'creditLimit' => $params['creditLimit'] ?? '',
+        'isMain' => $params['isMain'] ?? '',
+    ];
+
+    // var_dump($data); // Debugging output
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // var_dump($response); // Debugging output
+    if ($httpCode === 200) {
+        return true;
+    }
+
+    return false;
+}
+
+function getAccounts($token, $page = 1, $pageSize = 5) {
+    global $hostBanking;
+    $url = $hostBanking . "/banking/bank-accounts?page=$page&pageSize=$pageSize";
+    $headers = [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    return json_decode($response, true)['items'];
+}
+
+function getBalance($token) {
+    global $hostBanking;
+    $url = $hostBanking . "/banking/balance";
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    return $response;
+}
+
+function replenishAccount( $bankingAccount, $amount, $token) {
+    // Пример реализации функции пополнения счета
+    global $hostBanking;
+    $url = $hostBanking . "/banking/replenish";
+
+    $data = [
+        'bankingAccount' => $bankingAccount,
+        'amount' => $amount
+    ];
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($httpCode === 200) {
+        return true;
+    }
+    
+    return false;
+}
+
+function getAccountTransactions($accountId, $token, $page = 1, $pageSize = 5) {
+    global $hostBanking;
+    $url = $hostBanking . "/banking/transactions?BankingAccountId=$accountId&Page=$page&PageSize=$pageSize";
+    $headers = [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $decodedResponse = json_decode($response, true);
+    return !empty($decodedResponse['items']) ? $decodedResponse['items'] : [];
+}
+
+
+function withdrawFromAccount( $bankingAccount, $amount, $token) {
+    // Пример реализации функции пополнения счета
+    global $hostBanking;
+    $url = $hostBanking . "/banking/withdraw";
+
+    $data = [
+        'bankingAccount' => $bankingAccount,
+        'amount' => $amount
+    ];
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($httpCode === 200) {
+        return true;
+    }
+    
+    return false;
+}
+
+function transferToAccount($phoneNumber, $bankingAccount, $amount, $token) {
+    // Пример реализации функции пополнения счета
+    global $hostBanking;
+    $url = $hostBanking . "/banking/transfer";
+
+    $data = [
+        'bankingAccount' => $bankingAccount,
+        'amount' => $amount,
+        'recipientTelephoneNumber' => $phoneNumber,
+    ];
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    // var_dump($response); // Debugging output
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($httpCode === 200) {
+        return true;
+    }
+    
+    return false;
+}
 ?>
