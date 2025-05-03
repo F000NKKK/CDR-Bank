@@ -1,0 +1,38 @@
+version: '3.1'
+
+services:
+  cdr-bank-banking-api:
+    image: registry.voluntas-progressus.tech/cdr-bank/api/banking-api:${ENV}
+    container_name: cdr-bank-${ENV}-banking-api
+    build:
+      context: ../../../
+      dockerfile: ./CDR-Bank.Banking/Dockerfile
+    environment:
+      - APPLICATION_ENVIRONMENT=${ENV}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - CONTAINER_IP=${CONTAINER_IP}
+      - IDENTITY_SERVER_HOST=${IDENTITY_SERVER_HOST}
+      - IDENTITY_SERVER_PORT=${IDENTITY_SERVER_PORT}
+      - API_GATEWAY_PFX_PASSWORD=${API_GATEWAY_PFX_PASSWORD}
+    volumes:
+      - cdr-bank-banking-api-logs:/app/logs
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1G"
+        max-file: "7"
+    networks:
+      vp_subnet:
+        ipv4_address: ${CONTAINER_IP}
+        aliases:
+          - cdr-bank-banking-api
+
+volumes:
+  cdr-bank-banking-api-logs:
+    name: cdr-bank-${ENV}-banking-api-logs
+    driver: local
+    driver_opts:
+      type: "none"
+      device: ${REMOTE_PATH_LOGS}
+      o: "bind"

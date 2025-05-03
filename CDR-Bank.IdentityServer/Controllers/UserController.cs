@@ -2,7 +2,6 @@ using CDR_Bank.IndentityServer.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
 using CDR_Bank.Libs.Identity.Contracts.RequestContracts.Abstractions;
 using CDR_Bank.Libs.Identity.Contracts.ResponseContracts;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CDR_Bank.Hub.Controllers
