@@ -35,3 +35,10 @@ volumes:
       type: "none"
       device: ${REMOTE_PATH_LOGS}
       o: "bind"
+
+networks:
+  vp_subnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.35.0.0/24"
