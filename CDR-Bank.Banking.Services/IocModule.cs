@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using CDR_Bank.Banking.Services.Abstractions;
+using CDR_Bank.Hub.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -23,15 +24,18 @@ namespace CDR_Bank.Banking.Services
 
         private void RegisterConfiguration(ContainerBuilder builder)
         {
-            // Здесь можно регистрировать IOptions, IConfigurationSection и пр.
             builder.RegisterInstance(_configuration).As<IConfiguration>().SingleInstance();
         }
 
         private void RegisterServices(ContainerBuilder builder)
         {
             builder.RegisterType<BankingService>()
-                   .As<IBankingService>()
-                   .InstancePerLifetimeScope();
+                .As<IBankingService>()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<AccountValidationService>()
+                .As<IAccountValidationService>()
+                .InstancePerLifetimeScope();
         }
 
         private void RegisterModules(ContainerBuilder builder)
