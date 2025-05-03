@@ -80,13 +80,22 @@ function getToken() {
  * @param string $password
  * @return string
  */
-function registerUser($email, $password) {
+function registerUser($params) {
     global $host;
     $registerUrl = $host . "/account/registration";
 
     $data = [
-        'email' => $email,
-        'password' => $password
+        'email' => $params['email'] ?? '',
+        'password' => $params['password'] ?? '',
+        'lastName' => $params['lastName'] ?? '',
+        'firstName' => $params['firstName'] ?? '',
+        'middleName' => $params['middleName'] ?? '',
+        'birthDate' => $params['birthDate'] ?? '',
+        'phone' => $params['phone'] ?? '',
+        'country' => $params['country'] ?? '',
+        'city' => $params['city'] ?? '',
+        'address' => $params['address'] ?? '',
+        'postalCode' => $params['postalCode'] ?? ''
     ];
 
     $ch = curl_init($registerUrl);

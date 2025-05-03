@@ -1,5 +1,6 @@
 using CDR_Bank.IndentityServer.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
+using CDR_Bank.Libs.Identity.Contracts.RequestContracts;
 using CDR_Bank.Libs.Identity.Contracts.RequestContracts.Abstractions;
 using CDR_Bank.Libs.Identity.Contracts.ResponseContracts;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace CDR_Bank.Hub.Controllers
         [HttpPost("registration")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse> Registration([FromBody] UserLoginData request)
+        public ActionResult<TokenResponse> Registration([FromBody] UserRegistrationContract request)
         {
             if (request == null)
                 return BadRequest("Invalid request payload.");
