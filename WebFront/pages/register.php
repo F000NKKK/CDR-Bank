@@ -45,10 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="errorMessage" class="text-danger mt-3"><?= htmlspecialchars($errorMessage) ?></div>
             <?php elseif (!empty($successMessage)): ?>
                 <div id="successMessage" class="text-success mt-3"><?= htmlspecialchars($successMessage) ?></div>
+                <?php $_SESSION['page'] = "profile"?>
                 <script>
                     setTimeout(function() {
-                        window.location.href = '/profile.php';
-                    }, 2000);
+                        window.location.href = '/';
+                    }, 1500);
                 </script>
             <?php endif; ?>
             </div>

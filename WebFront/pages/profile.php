@@ -1,9 +1,23 @@
 <?php
 
 if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
-    echo "<script>window.location.href = '/login.php';</script>";
+    $_SESSION['page'] = "login";
+    echo "<script>window.location.href = '/';</script>";
     exit();
 }
+
+if (isset($_COOKIE['token'])) {
+    $user = getUserProfile($_COOKIE['token']);
+} else {
+    getToken();
+    echo "<script>window.location.href = '/';</script>";
+    exit();
+}
+
+if(!$user) {
+    echo "<script>alert('Ошибка: {Error: API cant work!}');</script>";
+}
+
 ?>
 <div class="container mt-5">
         <div class="row">
@@ -13,7 +27,7 @@ if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
                         <img src="assets/images/images.png" class="rounded-circle mb-3" alt="Фото профиля">
                         <h5 class="card-title text-highlight">Иван Иванов</h5>
                         <p class="card-text">Номер счета: 123456789</p>
-                        <p class="card-text">Электронная почта: IvanIvanov@example.com</p>
+                        <p class="card-text">Электронная почта: <?php echo isset($user['email']) ? htmlspecialchars($user['email']) : 'Не указана'; ?></p>
                         <p class="card-text">Баланс: <span class="text-highlight">10,000 ₽</span></p>
                         <button class="btn btn-custom">Редактировать профиль</button>
                     </div>
@@ -32,21 +46,20 @@ if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>2023-03-01</td>
-                                    <td>Снятие в банкомате</td>
-                                    <td class="text-danger">- 200 ₽</td>
-                                </tr>
-                                <tr>
-                                    <td>2023-02-28</td>
-                                    <td>Зачисление зарплаты</td>
-                                    <td class="text-success">+ 5,000 ₽</td>
-                                </tr>
-                                <tr>
-                                    <td>2023-02-25</td>
-                                    <td>Покупка онлайн</td>
-                                    <td class="text-danger">- 150 ₽</td>
-                                </tr>
+                                <?php
+                                if (isset($user['transactions']) && is_array($user['transactions'])) {
+                                    foreach ($user['transactions'] as $transaction) {
+                                        echo "<tr>";
+                                        echo "<td>" . htmlspecialchars($transaction['date']) . "</td>";
+                                        echo "<td>" . htmlspecialchars($transaction['description']) . "</td>";
+                                        echo "<td class='" . ($transaction['amount'] < 0 ? "text-danger" : "text-success") . "'>" . 
+                                             ($transaction['amount'] < 0 ? "- " : "+ ") . abs($transaction['amount']) . " ₽</td>";
+                                        echo "</tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='3'>Нет доступных транзакций</td></tr>";
+                                }
+                                ?>
                             </tbody>
                         </table>
                         <button class="btn btn-custom">Просмотреть все транзакции</button>

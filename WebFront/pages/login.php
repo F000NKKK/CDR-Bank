@@ -34,6 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $loginResult = authenticateUser($email, $password);
         if ($loginResult) {
             echo '<div class="alert alert-success text-center mt-3">Login successful!</div>';
+            $_SESSION['page'] = "profile";
+            echo "<script>setTimeout(function() {window.location.href = '/';}, 1500); </script>";
+
         } else {
             echo '<div class="alert alert-danger text-center mt-3">Invalid email or password.</div>';
         }

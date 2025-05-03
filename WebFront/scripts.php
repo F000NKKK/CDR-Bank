@@ -1,9 +1,10 @@
 <?php
+ob_start();
 session_start();
 // Start the session to manage user authentication and session data
 
 // Define the host URL for the API
-$host = "https://192.168.77.130:52339";
+$host = "https://localhost:52339";
 // Determine the current page from the session or default to 'main'
 $page = isset($_SESSION['page']) ? $_SESSION['page'] : 'main';
 
@@ -44,6 +45,8 @@ function authenticateUser($email, $password) {
             // Store the token in the session and set a cookie
             $_SESSION['token'] = $responseData['token'];
             $_SESSION['user_logged_in'] = true;
+
+            
             setcookie('token', $responseData['token'], time() + 3600, "/");
 
             return true;
@@ -282,6 +285,31 @@ function payMoney($recipientPhone, $amount) {
 
     return "Failed to transfer money!";
 }
+
+function getUserProfile($token) {
+    global $host;
+    $url = $host . "/account/get-user";
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    }
+    
+    return false;
+}
+
 
 // Handle POST requests for user authentication
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
