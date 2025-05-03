@@ -1,4 +1,4 @@
-﻿namespace CDR_Bank.Libs.Hub.Contracts.Request.Abstractions
+﻿namespace CDR_Bank.Libs.Banking.Contracts.RequestContracts.Abstractions
 {
     public abstract class BaseBankingContract
     {  
