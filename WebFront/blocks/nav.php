@@ -52,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
                                 // Clear session data
                                 session_unset();
                                 session_destroy();
+                                $_SESSION['user_logged_in'] === false;
 
                                 // Clear cookies
                                 if (isset($_COOKIE['token'])) {
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
                                 }
 
                                 // Redirect to the login page or home
-                                header('Location: index.php');
+                                echo '<script>window.location.href = "' . $_SERVER['PHP_SELF'] . '";</script>';
                                 exit;
                             }
                             ?>

@@ -8,6 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $confirmPassword) {
         $errorMessage = "Passwords do not match.";
     }
+    
+    registerUser($email, $password);
+    if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in']) {
+        $successMessage = "Registration successful! You are now logged in.";
+    } else {
+        $errorMessage = "Registration failed! Please try again.";
+    }
 }
 ?>
 <div class="container mt-5">
@@ -37,6 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="errorMessage" class="text-danger mt-3"><?= htmlspecialchars($errorMessage) ?></div>
             <?php elseif (!empty($successMessage)): ?>
                 <div id="successMessage" class="text-success mt-3"><?= htmlspecialchars($successMessage) ?></div>
+                <script>
+                    setTimeout(function() {
+                        window.location.href = '/profile.php';
+                    }, 2000);
+                </script>
             <?php endif; ?>
             </div>
         </div>
