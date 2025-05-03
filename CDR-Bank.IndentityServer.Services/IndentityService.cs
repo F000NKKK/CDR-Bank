@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using CDR_Bank.Libs.Identity.Contracts.RequestContracts;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CDR_Bank.IndentityServer.Services
@@ -132,6 +133,7 @@ namespace CDR_Bank.IndentityServer.Services
         {
             UserData data = CheckJwtToken(token);
             User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id))!;
+
             UserContactInfo contactInfo = user.ContactInfo;
             if (contactInfo is null)
             {

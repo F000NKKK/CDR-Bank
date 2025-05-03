@@ -13,17 +13,18 @@ namespace CDR_Bank.DataAccess.Identity
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // User ←→ ContactInfo (1:1)
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.ContactInfo)
                 .WithOne(ci => ci.User)
                 .HasForeignKey<UserContactInfo>(ci => ci.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Ограничения и индексы
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-            .IsUnique();
+                .Navigation(u => u.ContactInfo)
+                .AutoInclude();
         }
+
     }
 }
