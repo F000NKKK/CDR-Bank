@@ -19,7 +19,7 @@ namespace CDR_Bank.Libs.API.Extensions
                 app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
-                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "TimeTracking API v1");
+                    options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
                     options.RoutePrefix = "swagger";
                 });
             }

@@ -98,6 +98,11 @@ namespace CDR_Bank.IndentityServer.Services
             if (string.IsNullOrEmpty(_secretKey))
                 throw new ArgumentNullException(nameof(_secretKey), "JWT secret key is not set in the configuration");
 
+            if (token.StartsWith("Bearer"))
+            {
+                token = token.Split(' ')[1];
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var tokenHandler = new JwtSecurityTokenHandler();
             
