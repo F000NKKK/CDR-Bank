@@ -182,6 +182,9 @@ namespace CDR_Bank.Banking.Services
         {
             var account = GetAccountIfOpen(bankingAccountId);
 
+            if (account > MAX_WITHDRAW_AMOUNT)
+                return false;
+
             if (account == null)
                 return false;
 
@@ -351,5 +354,7 @@ namespace CDR_Bank.Banking.Services
                 account.IsMain = isMain.Value;
             }
         }
+
+        private const decimal MAX_WITHDRAW_AMOUNT = 30_000m;
     }
 }
