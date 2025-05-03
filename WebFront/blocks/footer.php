@@ -1,0 +1,1 @@
+<p>&copy; <?php echo date("Y"); ?> CDR Bank. All rights reserved.</p>

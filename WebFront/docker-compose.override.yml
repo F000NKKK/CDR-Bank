@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  cdr-bank-web-client:
+    image: php:8.2-apache
+    container_name: cdr-bank-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+      - ./apache.conf:/etc/apache2/conf-available/custom_apache.conf
+    networks:
+      cdr_bank_net:
+        ipv4_address: 172.35.0.2
