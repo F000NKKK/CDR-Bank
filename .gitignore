@@ -398,3 +398,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/CDR-Bank.WebClient/.angular/cache/19.2.7
