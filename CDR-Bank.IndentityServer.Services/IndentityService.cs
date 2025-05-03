@@ -65,7 +65,7 @@ namespace CDR_Bank.IndentityServer.Services
 
             user.ContactInfo = userContactInfo;
 
-            _context.Users.Add(user);
+            _context.Add(user);
             _context.SaveChanges();
             return GenerateJwtToken(user.Id, user.Email);
         }
@@ -74,49 +74,47 @@ namespace CDR_Bank.IndentityServer.Services
         public bool Edit(string token, UserContactInfoContract contactInfoContract)
         {
             UserData data = CheckJwtToken(token);
-            User user = _context.Users.FirstOrDefault(u => u.Email == data.Email);
+            User? user = _context.Users.FirstOrDefault(u => u.Email == data.Email);
             if(user is null)
             {
                 return false;
             }
 
-            UserContactInfo contactInfo = user.ContactInfo;
+            UserContactInfo contactInfo = user.ContactInfo!;
 
-            if (!contactInfoContract.City.Equals(""))
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.City))
             {
                 contactInfo.City = contactInfoContract.City;
             }
-            if (!contactInfoContract.Address.Equals(""))
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.Address))
             {
                 contactInfo.Address = contactInfoContract.Address;
             }
-            if (!contactInfoContract.BirthDate.Equals(""))
-            {
-                contactInfo.BirthDate = contactInfoContract.BirthDate;
-            }
-            if (!contactInfoContract.Country.Equals(""))
+            
+            contactInfo.BirthDate = contactInfoContract.BirthDate;
+            
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.Country))
             {
                 contactInfo.Country = contactInfoContract.Country;
             }
-            if (!contactInfoContract.FirstName.Equals(""))
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.FirstName))
             {
                 contactInfo.FirstName = contactInfoContract.FirstName;
             }
-            if (!contactInfoContract.LastName.Equals(""))
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.LastName))
             {
                 contactInfo.LastName = contactInfoContract.LastName;
             }
-            if (!contactInfoContract.MiddleName.Equals(""))
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.MiddleName))
             {
                 contactInfo.MiddleName = contactInfoContract.MiddleName;
             }
-            if (!contactInfoContract.PostalCode.Equals(""))
+            if (!string.IsNullOrWhiteSpace(contactInfoContract.PostalCode))
             {
                 contactInfo.PostalCode = contactInfoContract.PostalCode;
             }
 
-
-            _context.ContactInfos.Update(contactInfo);
+            _context.Update(contactInfo);
             _context.SaveChanges();
             return true;
         }
@@ -126,14 +124,14 @@ namespace CDR_Bank.IndentityServer.Services
         public UserData GetUserData(string token)
         {
             UserData data = CheckJwtToken(token);
-            data.CreatedAt = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id)).CreatedAt;
+            data.CreatedAt = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id))!.CreatedAt;
             return data;
         }
 
         public UserContactInfoContract GetUserContactsData(string token)
         {
             UserData data = CheckJwtToken(token);
-            User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id));
+            User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id))!;
             UserContactInfo contactInfo = user.ContactInfo;
             if (contactInfo is null)
             {
@@ -165,14 +163,14 @@ namespace CDR_Bank.IndentityServer.Services
             UserData data = CheckJwtToken(token);
             var bayts = Encoding.UTF8.GetBytes(passwordChange.OldPassword);
             var passwordHash = SHA512.HashData(bayts);
-            User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id)&&(u.PasswordHash==passwordHash.ToString()));
+            User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id)&&(u.PasswordHash==passwordHash.ToString()))!;
             if (user is null)
             {
                 return false;
             }
             bayts = Encoding.UTF8.GetBytes(passwordChange.NewPassword);
             passwordHash = SHA512.HashData(bayts);
-            user.PasswordHash = passwordHash.ToString();
+            user.PasswordHash = passwordHash.ToString()!;
             _context.Users.Update(user);
             return true;
         }
