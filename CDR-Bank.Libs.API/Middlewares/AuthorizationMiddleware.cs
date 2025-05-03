@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace CDR_Bank.Libs.API.Middlewares
 {
@@ -33,7 +34,7 @@ namespace CDR_Bank.Libs.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-#if !DEBUG
+#if DEBUG
             var path = context.Request.Path.Value;
 
             if (string.IsNullOrWhiteSpace(path)
@@ -94,6 +95,11 @@ namespace CDR_Bank.Libs.API.Middlewares
                     await RespondUnauthorizedAsync(context, AuthorizationConstants.ErrorCodes.AuthenticationFailed);
                     return;
                 }
+
+                var userData = await response.Content.ReadAsStringAsync();
+                var user = JsonConvert.DeserializeObject<UserDataContract>(userData);
+
+                context.Items["User"] = user;
             }
             catch (Exception ex)
             {

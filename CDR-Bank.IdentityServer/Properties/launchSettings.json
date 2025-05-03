@@ -1,8 +1,17 @@
 {
   "profiles": {
-    "CDR-Bank.IdentityServer": {
+    "Run": {
       "commandName": "Project",
       "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://*:52339;http://*:52340"
+    },
+
+    "RunWithoutBrowser": {
+      "commandName": "Project",
+      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

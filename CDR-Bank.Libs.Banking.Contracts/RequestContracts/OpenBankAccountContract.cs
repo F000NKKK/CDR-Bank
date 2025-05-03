@@ -8,11 +8,6 @@ namespace CDR_Bank.Libs.Banking.Contracts.RequestContracts
     public class OpenBankAccountContract
     {
         /// <summary>
-        /// User identifier who opens the account.
-        /// </summary>
-        public Guid UserId { get; set; }
-
-        /// <summary>
         /// Name for the new account (e.g., "My Savings").
         /// </summary>
         public string Name { get; set; } = string.Empty;

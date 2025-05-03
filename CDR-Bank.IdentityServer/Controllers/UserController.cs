@@ -54,7 +54,7 @@ namespace CDR_Bank.Hub.Controllers
         [HttpGet("get-user")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse> GetUser()
+        public ActionResult<UserData> GetUser()
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
             UserData result = _identityService.GetUserData(token);
@@ -62,9 +62,9 @@ namespace CDR_Bank.Hub.Controllers
         }
         
         [HttpGet("get-user-contact-info")]
-        [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserContactInfoContract), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse> GetUserContactInfo()
+        public ActionResult<UserContactInfoContract> GetUserContactInfo()
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
             UserContactInfoContract result = _identityService.GetUserContactsData(token);
