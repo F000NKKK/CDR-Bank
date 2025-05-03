@@ -217,7 +217,7 @@ namespace CDR_Bank.Banking.Services
             };
 
             _bankingDataContext.Transactions.Add(transaction);
-
+            _bankingDataContext.Update(account);
             _bankingDataContext.SaveChanges();
 
             return true;
