@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj" />
+    <ProjectReference Include="..\CDR-Bank.Libs.Banking.Contracts\CDR-Bank.Libs.Banking.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
