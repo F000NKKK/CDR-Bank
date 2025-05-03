@@ -115,7 +115,7 @@ function registerUser($params) {
 
     $responseData = json_decode($response, true);
 
-    var_dump($responseData); // Debugging output
+    // var_dump($responseData); // Debugging output
 
     if ($httpCode === 200) {
         $responseData = json_decode($response, true);
@@ -132,8 +132,48 @@ function registerUser($params) {
             return "Registration and authentication successful!";
         }
     }
+    $_SESSION['user_logged_in'] = false;
+    return "Registration failed!";
+}
 
-    return $responseData['message'] ?? "Registration failed!";
+function updateUserProfile($params, $token) {
+    global $host;
+
+    $url = $host . "/account/edit";
+
+    $data = [
+        'lastName' => $params['lastName'] ?? '',
+        'firstName' => $params['firstName'] ?? '',
+        'middleName' => $params['middleName'] ?? '',
+        'birthDate' => $params['birthDate'] ?? '',
+        'country' => $params['country'] ?? '',
+        'city' => $params['city'] ?? '',
+        'address' => $params['address'] ?? '',
+        'postalCode' => $params['postalCode'] ?? ''
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $token,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    var_dump($response); // Debugging output
+
+    if ($httpCode === 200) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -301,7 +341,7 @@ function payMoney($recipientPhone, $amount) {
 
 function getUserProfile($token) {
     global $host;
-    $url = $host . "/account/get-user";
+    $url = $host . "/account/get-user-contact-info";
 
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -323,16 +363,4 @@ function getUserProfile($token) {
     return false;
 }
 
-
-// Handle POST requests for user authentication
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    if (authenticateUser($email, $password)) {
-        // Authentication successful
-    } else {
-        // Authentication failed
-    }
-}
 ?>

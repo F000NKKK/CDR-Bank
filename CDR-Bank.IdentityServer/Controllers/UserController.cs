@@ -92,7 +92,7 @@ namespace CDR_Bank.Hub.Controllers
         [HttpPost("change-password")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse> ChangePassword(PasswordChange passwordChange)
+        public ActionResult ChangePassword(PasswordChange passwordChange)
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
             if (token.StartsWith("Bearer"))
@@ -115,7 +115,7 @@ namespace CDR_Bank.Hub.Controllers
         [HttpPost("edit")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse> Edit(UserContactInfoContract userContactInfo)
+        public ActionResult Edit(UserContactInfoContract userContactInfo)
         {
             var token = ControllerContext.HttpContext.Request.Headers.Authorization.ToString();
             if (token.StartsWith("Bearer"))
@@ -139,7 +139,7 @@ namespace CDR_Bank.Hub.Controllers
         [HttpPost("Test")]
         [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TokenResponse> Test(TokenResponse token)
+        public ActionResult Test(TokenResponse token)
         {
             _identityService.GetUserContactsData(token.Token);
             return Ok();
