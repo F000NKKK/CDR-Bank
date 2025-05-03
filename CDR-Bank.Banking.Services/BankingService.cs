@@ -134,7 +134,7 @@ namespace CDR_Bank.Banking.Services
             if (!_accountValidationService.CanTransfer(sender, amount))
                 return false;
 
-            var recipientUserId = _identityDataContext.ContactInfos.FirstOrDefault(f => f.PhoneNumber == recipientTelephone).UserId;
+            var recipientUserId = _identityDataContext.ContactInfos.Where(f => f.PhoneNumber == recipientTelephone).Select(s => s.UserId).FirstOrDefault();
 
             var recipient = _bankingDataContext.BankAccounts
                 .FirstOrDefault(a => a.UserId == recipientUserId
