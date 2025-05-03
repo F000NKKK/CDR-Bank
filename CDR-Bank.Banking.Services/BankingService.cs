@@ -135,7 +135,6 @@ namespace CDR_Bank.Banking.Services
             if (recipient == null)
                 return false;
 
-            // Дебет и кредит
             sender.Balance -= amount;
             recipient.Balance += amount;
 
@@ -249,20 +248,6 @@ namespace CDR_Bank.Banking.Services
                 UserId = account?.UserId ?? Guid.Empty,
                 AccountNumber = account?.AccountNumber ?? string.Empty
             };
-        }
-
-        private void ResetOtherMainAccounts(Guid userId, Guid? excludeAccountId = null)
-        {
-            var mainAccounts = _bankingDataContext.BankAccounts
-                .Where(a => a.UserId == userId && a.IsMain && (!excludeAccountId.HasValue || a.Id != excludeAccountId.Value))
-                .ToList();
-
-            foreach (var acc in mainAccounts)
-            {
-                acc.IsMain = false;
-                _bankingDataContext.Update(acc);
-            }
-            _bankingDataContext.SaveChanges();
         }
 
         public Guid CreateAccount(Guid userId, string name, BankAccountType type, decimal? creditLimit = null, bool isMain = false)
