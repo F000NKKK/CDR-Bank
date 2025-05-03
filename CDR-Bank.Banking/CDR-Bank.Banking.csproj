@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CDR-Bank.Hub.Services\CDR-Bank.Hub.Services.csproj" />
+    <ProjectReference Include="..\CDR-Bank.Banking.Services\CDR-Bank.Banking.Services.csproj" />
     <ProjectReference Include="..\CDR-Bank.Libs.API\CDR-Bank.Libs.API.csproj" />
-    <ProjectReference Include="..\CDR-Bank.Libs.Hub.Contracts\CDR-Bank.Libs.Hub.Contracts.csproj" />
+    <ProjectReference Include="..\CDR-Bank.Libs.Banking.Contracts\CDR-Bank.Libs.Banking.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

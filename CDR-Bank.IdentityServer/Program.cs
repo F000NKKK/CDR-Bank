@@ -1,7 +1,7 @@
 using CDR_Bank.Libs.API;
 using Microsoft.AspNetCore.Builder;
 
-namespace CDR_Bank.Hub
+namespace CDR_Bank.Banking
 {
     public class Program
     {

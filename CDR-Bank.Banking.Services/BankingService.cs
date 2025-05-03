@@ -1,6 +1,6 @@
-﻿using CDR_Bank.Hub.Services.Abstractions;
+﻿using CDR_Bank.Banking.Services.Abstractions;
 
-namespace CDR_Bank.Hub.Services
+namespace CDR_Bank.Banking.Services
 {
     internal class BankingService : IBankingService
     {

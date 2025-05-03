@@ -1,9 +1,9 @@
-using CDR_Bank.Hub.Services.Abstractions;
+using CDR_Bank.Banking.Services.Abstractions;
 using CDR_Bank.Libs.API.Abstractions;
-using CDR_Bank.Libs.Hub.Contracts.Banking;
+using CDR_Bank.Libs.Hub.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CDR_Bank.Hub.Controllers
+namespace CDR_Bank.Banking.Controllers
 {
     /// <summary>
     /// Controller for handling banking operations such as replenishment, withdrawal, and transfer.
