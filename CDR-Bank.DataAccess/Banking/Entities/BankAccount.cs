@@ -7,6 +7,8 @@ namespace CDR_Bank.DataAccess.Banking.Entities
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserId { get; set; } // from Identity
         public string AccountNumber { get; set; } = Guid.NewGuid().ToString();
+        public string TelephoneNumber { get; set; }
+        public bool IsMain { get; set; }
         public string Name { get; set; } = string.Empty;
         public BankAccountType Type { get; set; }
         public AccountState State { get; set; } = AccountState.Open;

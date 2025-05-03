@@ -47,7 +47,7 @@ namespace CDR_Bank.Banking.Services
                 return false;
 
             var recipientAccount = _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Name == recipientTelephoneNumber && a.State == AccountState.Open);
+                .FirstOrDefault(a => a.TelephoneNumber == recipientTelephoneNumber && a.State == AccountState.Open && a.IsMain);
 
             if (recipientAccount == null)
                 return false;
@@ -127,42 +127,6 @@ namespace CDR_Bank.Banking.Services
 
             return true;
         }
-
-        public Guid OpenDebitAccount(Guid userId, string name)
-        {
-            var account = new BankAccount
-            {
-                UserId = userId,
-                Name = name,
-                Type = BankAccountType.Debit,
-                State = AccountState.Open,
-                Balance = 0m
-            };
-
-            _bankingDataContext.BankAccounts.Add(account);
-            _bankingDataContext.SaveChanges();
-
-            return account.Id;
-        }
-
-        public Guid OpenCreditAccount(Guid userId, string name, decimal limit)
-        {
-            var account = new BankAccount
-            {
-                UserId = userId,
-                Name = name,
-                Type = BankAccountType.Credit,
-                State = AccountState.Open,
-                Balance = 0m,
-                CreditLimit = limit
-            };
-
-            _bankingDataContext.BankAccounts.Add(account);
-            _bankingDataContext.SaveChanges();
-
-            return account.Id;
-        }
-
         public bool CloseAccount(Guid bankingAccountId)
         {
             var account = _bankingDataContext.BankAccounts
@@ -176,7 +140,62 @@ namespace CDR_Bank.Banking.Services
             return true;
         }
 
-        public bool EditAccount(Guid bankingAccountId, string? name, BankAccountType? type, decimal? creditLimit)
+        public BankAccount? GetAccountData(Guid bankingAccountId)
+        {
+            return _bankingDataContext.BankAccounts
+                .FirstOrDefault(a => a.Id == bankingAccountId);
+        }
+
+        private void ResetOtherMainAccounts(Guid userId, Guid? excludeAccountId = null)
+        {
+            var mainAccounts = _bankingDataContext.BankAccounts
+                .Where(a => a.UserId == userId && a.IsMain && (!excludeAccountId.HasValue || a.Id != excludeAccountId.Value))
+                .ToList();
+
+            foreach (var acc in mainAccounts)
+                acc.IsMain = false;
+        }
+
+        private Guid CreateAccount(Guid userId, string name, BankAccountType type, decimal? creditLimit = null, bool isMain = false)
+        {
+            if (isMain)
+                ResetOtherMainAccounts(userId);
+
+            var account = new BankAccount
+            {
+                UserId = userId,
+                Name = name,
+                Type = type,
+                State = AccountState.Open,
+                Balance = 0m,
+                CreditLimit = type == BankAccountType.Credit ? creditLimit ?? 0 : null,
+                IsMain = isMain
+            };
+
+            _bankingDataContext.BankAccounts.Add(account);
+            _bankingDataContext.SaveChanges();
+
+            return account.Id;
+        }
+
+        private void ApplyMainAccountFlag(BankAccount account, bool? isMain)
+        {
+            if (isMain.HasValue)
+            {
+                if (isMain.Value && !account.IsMain)
+                    ResetOtherMainAccounts(account.UserId, account.Id);
+
+                account.IsMain = isMain.Value;
+            }
+        }
+
+        public Guid OpenDebitAccount(Guid userId, string name, bool isMain = false)
+            => CreateAccount(userId, name, BankAccountType.Debit, null, isMain);
+
+        public Guid OpenCreditAccount(Guid userId, string name, decimal limit, bool isMain = false)
+            => CreateAccount(userId, name, BankAccountType.Credit, limit, isMain);
+
+        public bool EditAccount(Guid bankingAccountId, string? name, BankAccountType? type, decimal? creditLimit, bool? isMain = null)
         {
             var account = _bankingDataContext.BankAccounts
                 .FirstOrDefault(a => a.Id == bankingAccountId);
@@ -193,14 +212,10 @@ namespace CDR_Bank.Banking.Services
             if (type == BankAccountType.Credit && creditLimit.HasValue)
                 account.CreditLimit = creditLimit;
 
+            ApplyMainAccountFlag(account, isMain);
+
             _bankingDataContext.SaveChanges();
             return true;
-        }
-
-        public BankAccount? GetAccountData(Guid bankingAccountId)
-        {
-            return _bankingDataContext.BankAccounts
-                .FirstOrDefault(a => a.Id == bankingAccountId);
         }
     }
 }

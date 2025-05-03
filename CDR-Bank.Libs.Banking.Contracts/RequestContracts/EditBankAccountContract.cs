@@ -22,5 +22,6 @@ namespace CDR_Bank.Libs.Banking.Contracts.RequestContracts
         /// New credit limit for credit accounts (optional).
         /// </summary>
         public decimal? CreditLimit { get; set; }
+        public bool? IsMain { get; set; }
     }
 }

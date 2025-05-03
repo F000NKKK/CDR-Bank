@@ -17,8 +17,11 @@ namespace CDR_Bank.DataAccess.Banking
             modelBuilder.Entity<BankAccount>(e =>
             {
                 e.HasKey(a => a.Id);
+
                 e.HasIndex(a => a.AccountNumber).IsUnique();
                 e.HasIndex(a => a.UserId);
+                e.HasIndex(a => a.TelephoneNumber);
+                e.HasIndex(a => new { a.UserId, a.IsMain }).IsUnique();
 
                 e.Property(a => a.Type).HasConversion<string>();
                 e.Property(a => a.State).HasConversion<string>();

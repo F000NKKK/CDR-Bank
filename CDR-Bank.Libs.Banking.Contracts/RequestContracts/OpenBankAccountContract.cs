@@ -26,5 +26,6 @@ namespace CDR_Bank.Libs.Banking.Contracts.RequestContracts
         /// Credit limit for credit accounts. Optional for debit accounts.
         /// </summary>
         public decimal? CreditLimit { get; set; }
+        public bool IsMain { get; set; }
     }
 }
