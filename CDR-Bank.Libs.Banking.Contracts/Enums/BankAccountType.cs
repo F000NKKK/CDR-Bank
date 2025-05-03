@@ -1,4 +1,4 @@
-﻿namespace CDR_Bank.DataAccess.Banking.Enums
+﻿namespace CDR_Bank.Libs.Banking.Contracts.Enums
 {
     public enum BankAccountType
     {
