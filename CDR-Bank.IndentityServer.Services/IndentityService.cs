@@ -120,8 +120,6 @@ namespace CDR_Bank.IndentityServer.Services
             return true;
         }
 
-
-
         public UserData GetUserData(string token)
         {
             UserData data = CheckJwtToken(token);

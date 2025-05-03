@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using CDR_Bank.DataAccess.Identity.Entities;
-using System.Data;
+﻿using CDR_Bank.DataAccess.Identity.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CDR_Bank.DataAccess.Identity
 {

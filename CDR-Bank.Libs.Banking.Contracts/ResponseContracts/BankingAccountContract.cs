@@ -4,14 +4,14 @@ namespace CDR_Bank.Libs.Banking.Contracts.ResponseContracts
 {
     public class BankingAccountContract
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public Guid UserId { get; set; } // from Identity
-        public string AccountNumber { get; set; } = Guid.NewGuid().ToString();
-        public string TelephoneNumber { get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public string AccountNumber { get; set; }
+        public string TelephoneNumber { get; set; }
         public bool IsMain { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; }
         public BankAccountType Type { get; set; }
-        public AccountState State { get; set; } = AccountState.Open;
+        public AccountState State { get; set; }
         public decimal Balance { get; set; } = 0m;
         public decimal? CreditLimit { get; set; }
     }
