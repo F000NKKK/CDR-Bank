@@ -7,7 +7,6 @@ using CDR_Bank.DataAccess.Models;
 using CDR_Bank.Hub.Services.Abstractions;
 using CDR_Bank.Libs.Banking.Contracts.RequestContracts;
 using CDR_Bank.Libs.Banking.Contracts.ResponseContracts;
-using Org.BouncyCastle.Utilities;
 
 namespace CDR_Bank.Banking.Services
 {
@@ -91,15 +90,12 @@ namespace CDR_Bank.Banking.Services
             };
         }
 
-        public void Replenish(Guid bankingAccountId, decimal amount)
+        public void Replenish(Guid userId, Guid bankingAccountId, decimal amount)
         {
             var account = _accountValidationService.GetAccountIfOpen(bankingAccountId)
                           ?? throw new InvalidOperationException("Account not found or is closed.");
 
-            if (amount > AMOUNT_FOR_THE_BONUS)
-            {
-                amount += BONUS_AMOUNT;
-            }
+            CheckAndAddBonusToDebit(userId, amount);
 
             account.Balance += amount;
 
@@ -114,6 +110,29 @@ namespace CDR_Bank.Banking.Services
             });
 
             _bankingDataContext.SaveChanges();
+        }
+
+        private void CheckAndAddBonusToDebit(Guid userId, decimal amount)
+        {
+            if (amount > AMOUNT_FOR_THE_BONUS)
+            {
+                var account = _bankingDataContext.BankAccounts.Where(a => a.UserId == userId).FirstOrDefault(a => a.Type == BankAccountType.Debit && a.State == AccountState.Open);
+
+                if (account is not null)
+                {
+                    account.Balance += BONUS_AMOUNT;
+
+                    _bankingDataContext.Transactions.Add(new AccountTransaction
+                    {
+                        BankingAccountId = account.Id,
+                        Type = TransactionType.Replenish,
+                        Status = TransactionStatus.Completed,
+                        Amount = amount,
+                        CreatedAt = DateTime.UtcNow,
+                        Description = "The deposit bonus is more than one million"
+                    });
+                }
+            }
         }
 
         private BankAccount? GetAccountIfOpen(Guid bankingAccountId)

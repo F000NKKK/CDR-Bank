@@ -32,10 +32,12 @@ public class BankingController : AController
     [HttpPost("replenish")]
     public IActionResult Replenish([FromBody] BankingOperationContract request)
     {
+        var userData = GetUserDataFromContext();
+
         if (request == null || request.Amount <= 0)
             return BadRequest("Invalid request payload.");
 
-        _bankingService.Replenish(request.BankingAccount, request.Amount);
+        _bankingService.Replenish(userData!.Id, request.BankingAccount, request.Amount);
         return Ok();
     }
 
