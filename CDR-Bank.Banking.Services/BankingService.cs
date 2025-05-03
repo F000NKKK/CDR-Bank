@@ -172,7 +172,7 @@ namespace CDR_Bank.Banking.Services
                 {
                     BankingAccountId = recipient.Id,
                     CounterpartyAccountId = sender.Id,
-                    Type = TransactionType.TransferToUser,
+                    Type = TransactionType.Replenish,
                     Status = TransactionStatus.Completed,
                     Amount = amount,
                     CreatedAt = DateTime.UtcNow,
