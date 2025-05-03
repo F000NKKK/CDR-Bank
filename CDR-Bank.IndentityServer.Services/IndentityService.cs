@@ -14,9 +14,10 @@ namespace CDR_Bank.IndentityServer.Services
     public class IndentityService : IIndentityService
     {
         IdentityDataContext _context;
-        private string secretKey = "";
-        public IndentityService(IdentityDataContext context)
+        private readonly string _secretKey;
+        public IndentityService(IdentityDataContext context, string secretKey)
         {
+            _secretKey = secretKey;
             _context = context;
         }
         public string Login(UserLoginData loginData)
@@ -77,10 +78,10 @@ namespace CDR_Bank.IndentityServer.Services
 
         private UserData CheckJwtToken(string token)
         {
-            if (string.IsNullOrEmpty(secretKey))
-                throw new ArgumentNullException(nameof(secretKey), "JWT secret key is not set in the configuration");
+            if (string.IsNullOrEmpty(_secretKey))
+                throw new ArgumentNullException(nameof(_secretKey), "JWT secret key is not set in the configuration");
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var tokenHandler = new JwtSecurityTokenHandler();
             
             var validationParameters = new TokenValidationParameters
@@ -110,13 +111,13 @@ namespace CDR_Bank.IndentityServer.Services
                 new Claim(ClaimTypes.Email, email),
             };
 
-            if (string.IsNullOrEmpty(secretKey))
-                throw new ArgumentNullException(nameof(secretKey), "JWT secret key is not set in the configuration");
+            if (string.IsNullOrEmpty(_secretKey))
+                throw new ArgumentNullException(nameof(_secretKey), "JWT secret key is not set in the configuration");
 
-            if (secretKey.Length < 32)
-                throw new ArgumentException("JWT secret key must be at least 32 bytes for A256CBC-HS512 algorithm", nameof(secretKey));
+            if (_secretKey.Length < 32)
+                throw new ArgumentException("JWT secret key must be at least 32 bytes for A256CBC-HS512 algorithm", nameof(_secretKey));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.Aes256CbcHmacSha512);
 
             var token = new JwtSecurityToken(
