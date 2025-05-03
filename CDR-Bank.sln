@@ -27,6 +27,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib's", "Lib's", "{7C2064CF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.DataAccess", "CDR-Bank.DataAccess\CDR-Bank.DataAccess.csproj", "{D3771C9C-D109-4807-9375-E1B62C72DBA8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{610E9C38-0746-4F00-98CB-1F63C615E508}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDR-Bank.IdentityServer.ApiClient", "CDR-Bank.IdentityServer.ApiClient\CDR-Bank.IdentityServer.ApiClient.csproj", "{783ED1D5-972F-4568-BBEA-71B847132D48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,10 @@ Global
 		{D3771C9C-D109-4807-9375-E1B62C72DBA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3771C9C-D109-4807-9375-E1B62C72DBA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3771C9C-D109-4807-9375-E1B62C72DBA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{783ED1D5-972F-4568-BBEA-71B847132D48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{783ED1D5-972F-4568-BBEA-71B847132D48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{783ED1D5-972F-4568-BBEA-71B847132D48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{783ED1D5-972F-4568-BBEA-71B847132D48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +82,7 @@ Global
 		{E4EA99E7-0580-41BA-B4F3-E4A5A6B34C09} = {5C1EDE06-8557-43E1-9B64-79C3F6E78144}
 		{56AD0357-7175-4953-A4BE-E4F6C8268E22} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{D3771C9C-D109-4807-9375-E1B62C72DBA8} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{783ED1D5-972F-4568-BBEA-71B847132D48} = {610E9C38-0746-4F00-98CB-1F63C615E508}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4CE0D61-8C54-408A-B79F-988630A69D72}
