@@ -133,7 +133,16 @@ namespace CDR_Bank.IndentityServer.Services
         public UserContactInfoContract GetUserContactsData(string token)
         {
             UserData data = CheckJwtToken(token);
-            UserContactInfo contactInfo = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id)).ContactInfo;
+            User user = _context.Users.FirstOrDefault(u => (u.Email == data.Email) && (u.Id == data.Id));
+            UserContactInfo contactInfo = user.ContactInfo;
+            if (contactInfo is null)
+            {
+                user.ContactInfo = new UserContactInfo();
+                _context.Users.Update(user);
+                _context.ContactInfos.Update(user.ContactInfo);
+                _context.SaveChanges();
+                contactInfo = user.ContactInfo;
+            }
             var result = new UserContactInfoContract
             {
                 PhoneNumber = contactInfo.PhoneNumber,
