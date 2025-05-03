@@ -75,6 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
                         <form method="post" style="display:inline;">
                             <button class="nav-link <?php if (isset($_SESSION['page']) && $_SESSION['page'] === 'register') { echo 'active'; } ?> btn btn-link" type="submit" name="page" value="register">Register</button>
                         </form>
+                    </li>
+                <?php endif; ?>
         </div>
     </div>
 </nav>
