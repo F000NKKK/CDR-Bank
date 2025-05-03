@@ -12,6 +12,7 @@ namespace CDR_Bank.Libs.API.Extensions
             services.AddControllers();
             return services;
         }
+
         public static IServiceCollection AddApiSwagger(this IServiceCollection services)
         {
             services.AddSwaggerGen(options =>
