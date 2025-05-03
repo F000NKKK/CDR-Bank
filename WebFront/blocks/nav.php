@@ -1,7 +1,7 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['page'])) {
     $_SESSION['page'] = $_POST['page'];
-    header('Location: ' . $_SERVER['PHP_SELF']);
+    echo '<script>window.location.href = "' . $_SERVER['PHP_SELF'] . '";</script>';
     exit;
 }
 ?>
