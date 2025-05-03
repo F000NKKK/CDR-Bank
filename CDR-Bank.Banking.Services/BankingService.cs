@@ -182,7 +182,7 @@ namespace CDR_Bank.Banking.Services
         {
             var account = GetAccountIfOpen(bankingAccountId);
 
-            if (account > MAX_WITHDRAW_AMOUNT)
+            if (amount > MAX_WITHDRAW_AMOUNT)
                 return false;
 
             if (account == null)
