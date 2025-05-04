@@ -1,0 +1,7 @@
+networks:
+  cdr_bank_network:
+      name: "cdr_bank_network"
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.36.0.0/24

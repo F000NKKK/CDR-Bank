@@ -30,9 +30,9 @@ RUN dotnet publish "./CDR-Bank.Banking.csproj" -c $BUILD_CONFIGURATION -o /app/p
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 
-ENV ConnectionStrings__IdentityDb="Server=localhost;Port=3306;Database=IdentityDb;User=root;Password=rootpassword;SslMode=Preferred;"
-ENV ConnectionStrings__BankingDb="Server=localhost;Port=3306;Database=BankingDb;User=root;Password=rootpassword;SslMode=Preferred;"
-ENV ApiSettings__AuthorizationEndpoint=".../account/get-user"
+ENV ConnectionStrings__IdentityDb="Server=cdr-db;Port=3306;Database=IdentityDb;User=root;Password=rootpassword;SslMode=Preferred;"
+ENV ConnectionStrings__BankingDb="Server=cdr-db;Port=3306;Database=BankingDb;User=root;Password=rootpassword;SslMode=Preferred;"
+ENV ApiSettings__AuthorizationEndpoint="identity-server/account/get-user"
 
 WORKDIR /app
 COPY --from=publish /app/publish .

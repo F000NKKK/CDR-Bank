@@ -1,0 +1,18 @@
+services:
+  cdr-bank:
+    container_name: cdr-bank-identity-server
+    build:
+      context: ./../
+      dockerfile: CDR-Bank.Banking/Dockerfile
+    environment:
+      - ConnectionStrings__IdentityDb=Server=cdr-db;Port=3306;Database=IdentityDb;User=root;Password=rootpassword;SslMode=Preferred;
+      - ConnectionStrings__BankingDb=Server=cdr-db;Port=3306;Database=BankingDb;User=root;Password=rootpassword;SslMode=Preferred;
+      - ApiSettings__AuthorizationEndpoint=identity-server/account/get-user
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    networks:
+      cdr_bank_network:
+        ipv4_address: ${CONTAINER_IP}
+        aliases:
+          - identity-servcd 

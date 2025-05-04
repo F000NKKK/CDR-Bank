@@ -29,7 +29,7 @@ RUN dotnet publish "./CDR-Bank.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 
-ENV ConnectionStrings__IdentityDb="Server=localhost;Port=3306;Database=IdentityDb;User=root;Password=rootpassword;SslMode=Preferred;"
+ENV ConnectionStrings__IdentityDb="Server=cdr-db;Port=3306;Database=IdentityDb;User=root;Password=rootpassword;SslMode=Preferred;"
 ENV ApiSettings__SecretKey="meGeNdIcklaryBErSKineYKNoWLiNEuSnESCoNAreCIonsABLe"
 
 WORKDIR /app

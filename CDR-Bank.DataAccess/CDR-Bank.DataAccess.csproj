@@ -20,9 +20,9 @@
     </PackageReference>
 	<PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.3" />
 	  
-	<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0" />
+	<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.4" />
   </ItemGroup>
 
 

@@ -4,23 +4,45 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CONTAINER_IP": "172.36.0.3"
       },
       "applicationUrl": "https://*:52339;http://*:52340"
     },
     "RunWithoutBrowser": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CONTAINER_IP": "172.36.0.3"
       },
       "applicationUrl": "https://*:52339;http://*:52340"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://*:52339;http://*:52340",
+        "CONTAINER_IP": "172.36.0.3"
+      },
+      "distributionName": ""
+    },
+    "Docker Compose (docker-compose.yml)": {
+      "commandName": "Executable",
+      "executablePath": "docker-compose",
+      "commandLineArgs": "--file ./CDR-Bank.IdentityServer/docker-compose.yml --file ./network.docker-compose.yml up --build",
+      "workingDirectory": "./../",
+      "environmentVariables": {
+        "CONTAINER_IP": "172.36.0.3"
+      }
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "CONTAINER_IP": "172.36.0.3"
       },
       "publishAllPorts": true,
       "useSSL": false

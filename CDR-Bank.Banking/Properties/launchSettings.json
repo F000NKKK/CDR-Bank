@@ -2,29 +2,40 @@
   "profiles": {
     "http": {
       "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://*:5262"
+      "applicationUrl": "http://*:5262",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CONTAINER_IP": "172.36.0.2"
+      }
     },
     "https": {
       "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://*:7297;http://*:5262"
+      "applicationUrl": "https://*:7297;http://*:5262",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CONTAINER_IP": "172.36.0.2"
+      }
+    },
+    "Docker Compose (docker-compose.yml)": {
+      "commandName": "Executable",
+      "executablePath": "docker-compose",
+      "commandLineArgs": "--file ./CDR-Bank.Banking/docker-compose.yml --file ./network.docker-compose.yml up --build",
+      "workingDirectory": "./../",
+      "environmentVariables": {
+        "CONTAINER_IP": "172.36.0.2"
+      }
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
-      },
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": false,
+      "environmentVariables": {
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "CONTAINER_IP": "172.36.0.2"
+      }
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"
