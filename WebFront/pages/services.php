@@ -1,6 +1,6 @@
 <div class="container my-5">
     <div class="card">
-        <div class="card-header bg-warning text-white">
+        <div class="card-header  text-white" style="background:#212529">
             <h1 class="card-title">Наши сервисы</h1>
         </div>
         <div class="card-body">

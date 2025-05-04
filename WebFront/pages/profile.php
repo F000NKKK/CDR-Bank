@@ -151,7 +151,7 @@ if(!$user) {
         </div>
     </div>
     <!-- Форма редактирования профиля -->
-    <div id="editProfileForm" class="action-form card p-4 my-5" style="display: none;">
+    <div id="editProfileForm" class="card p-4 my-5" style="display: none;">
         <h5 class="mb-3">Редактировать профиль</h5>
         <form method="post" action="">
             <div class="form-group">
@@ -407,7 +407,7 @@ if(!$user) {
             document.getElementById(formId).style.display = 'none';
         }
 
-        document.querySelector('.btn.btn-custom').addEventListener('click', function () {
+        document.querySelector('.btn.btn-warning').addEventListener('click', function () {
             const editProfileForm = document.getElementById('editProfileForm');
             if (editProfileForm.style.display === 'none' || editProfileForm.style.display === '') {
                 showForm('editProfileForm');
