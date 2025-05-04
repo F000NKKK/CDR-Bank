@@ -7,7 +7,6 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
 # Этот этап используется для сборки проекта службы
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -29,6 +28,10 @@ RUN dotnet publish "./CDR-Bank.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
+
+ENV ConnectionStrings__IdentityDb="Server=localhost;Port=3306;Database=IdentityDb;User=root;Password=rootpassword;SslMode=Preferred;"
+ENV ApiSettings__SecretKey="meGeNdIcklaryBErSKineYKNoWLiNEuSnESCoNAreCIonsABLe"
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CDR-Bank.IdentityServer.dll"]
