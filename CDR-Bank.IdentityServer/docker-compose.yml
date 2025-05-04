@@ -15,4 +15,4 @@ services:
       cdr_bank_network:
         ipv4_address: ${CONTAINER_IP}
         aliases:
-          - identity-servcd 
+          - identity-server
