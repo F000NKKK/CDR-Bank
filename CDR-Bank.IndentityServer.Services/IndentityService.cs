@@ -39,7 +39,7 @@ namespace CDR_Bank.IndentityServer.Services
         public string Registration(UserRegistrationContract registrationData)
         {
             
-            if (!(_context.Users.FirstOrDefault(u => u.Email == registrationData.Email) is null))
+            if (!(_context.Users.FirstOrDefault(u => u.Email == registrationData.Email || u.ContactInfo.PhoneNumber == registrationData.PhoneNumber) is null))
             {
                 return "";
             }
