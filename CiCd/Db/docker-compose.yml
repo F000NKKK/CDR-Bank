@@ -13,6 +13,16 @@ services:
     # Пробрасываем порт 3306 контейнера на хост (все интерфейсы)
     ports:
       - "3306:3306"
+    
+    
+  phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        restart: always
+        ports:
+        - "8888:80"
+        environment:
+            PMA_HOST: cdr-bank-mysql
+            MYSQL_ROOT_PASSWORD: rootpassword
 
 volumes:
   mysql-data:
