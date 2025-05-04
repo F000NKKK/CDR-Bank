@@ -7,7 +7,18 @@ if (!isset($_SESSION['user_logged_in']) || !$_SESSION['user_logged_in']) {
 }
 if (isset($_COOKIE['token'])) {
     $user = getUserProfile($_COOKIE['token']);
+    $accounts = getAccounts($_COOKIE['token']);
+    $mainAccount = null;
+    foreach ($accounts as $account) {
+        if (isset($account['isMain']) && $account['isMain'] === true) {
+            $mainAccount = $account;
+            break;
+        }
+    }
+    $balance = getBalance($_COOKIE['token']);
+    $transactions = $mainAccount ? getAccountTransactions($mainAccount['id'], $_COOKIE['token']) : [];
 } else {
+    $_SESSION['page'] = "login";
     echo "<script>window.location.href = '/';</script>";
     exit();
 }
@@ -27,15 +38,15 @@ if(!$user) {
                         <h5 class="card-title text-highlight"><?php echo isset($user['firstName']) ? htmlspecialchars($user['firstName']) : 'fName'; echo " "; echo isset($user['lastName']) ? htmlspecialchars($user['lastName']) : 'lName'; ?></h5>
                         <p class="card-text">Телефон: <?php echo isset($user['phoneNumber']) ? htmlspecialchars($user['phoneNumber']) : '+9-999-999-99-99';?></p>
                         <p class="card-text">Электронная почта: <?php echo isset($user['email']) ? htmlspecialchars($user['email']) : 'Не указана'; ?></p>
-                        <p class="card-text">Баланс: <span class="text-highlight">10,000 ₽</span></p>
-                        <button class="btn btn-custom">Редактировать профиль</button>
+                        <p class="card-text">Баланс: <span class="text-highlight"><?php echo isset($balance) ? htmlspecialchars($balance) : '0'; ?> ₽</span></p>
+                        <button class="btn btn-warning">Редактировать профиль</button>
                     </div>
                 </div>
             </div>
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title text-highlight">Последние транзакции</h5>
+                        <h5 class="card-title text-highlight">Последние транзакции основного счета</h5>
                         <table class="table table-dark table-hover">
                             <thead>
                                 <tr>
@@ -46,13 +57,35 @@ if(!$user) {
                             </thead>
                             <tbody>
                                 <?php
-                                if (isset($user['transactions']) && is_array($user['transactions'])) {
-                                    foreach ($user['transactions'] as $transaction) {
+                                if (isset($transactions) && is_array($transactions) && count($transactions) > 0) {
+                                    foreach ($transactions as $transaction) {
                                         echo "<tr>";
-                                        echo "<td>" . htmlspecialchars($transaction['date']) . "</td>";
+                                        echo "<td>" . htmlspecialchars(date("d.m.Y H:i", strtotime($transaction['createdAt']))) . "</td>";
                                         echo "<td>" . htmlspecialchars($transaction['description']) . "</td>";
-                                        echo "<td class='" . ($transaction['amount'] < 0 ? "text-danger" : "text-success") . "'>" . 
-                                             ($transaction['amount'] < 0 ? "- " : "+ ") . abs($transaction['amount']) . " ₽</td>";
+                                        $transactionType = isset($transaction['type']) ? (int)$transaction['type'] : -1;
+                                        $typeLabel = '';
+                                        switch ($transactionType) {
+                                            case 0:
+                                                $typeLabel = "Пополнение";
+                                                break;
+                                            case 1:
+                                                $typeLabel = "Снятие";
+                                                break;
+                                            case 2:
+                                                $typeLabel = "Перевод";
+                                                break;
+                                            case 3:
+                                                $typeLabel = "Внутренний перевод";
+                                                break;
+                                            default:
+                                                $typeLabel = "Неизвестный тип";
+                                                break;
+                                        }
+                                        $amount = $transaction['amount'];
+                                        $isDebit = in_array($transactionType, [1, 2]); // Снятие или Перевод
+                                        $formattedAmount = ($isDebit ? "- " : "+ ") . abs($amount) . " ₽ ($typeLabel)";
+                                        $amountClass = $isDebit ? "text-danger" : "text-success";
+                                        echo "<td class='" . $amountClass . "'>" . $formattedAmount . "</td>";
                                         echo "</tr>";
                                     }
                                 } else {
@@ -61,8 +94,58 @@ if(!$user) {
                                 ?>
                             </tbody>
                         </table>
-                        <button class="btn btn-custom">Просмотреть все транзакции</button>
+                        <!-- <button class="btn btn-warning">Просмотреть все транзакции</button> -->
                     </div>
+                </div>
+                <!-- Форма создания нового счета -->
+                <div id="createAccountForm" class="card p-4 my-5">
+                    <h5 class="mb-3">Создать новый счет</h5>
+                    <form method="post" action="">
+                        <div class="form-group">
+                            <label for="accountName">Название счета</label>
+                            <input type="text" class="form-control" id="accountName" name="accountName" placeholder="Введите название счета" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="accountType">Тип счета</label>
+                            <select class="form-control" id="accountType" name="accountType" required>
+                                <option value="0">Дебетовый</option>
+                                <option value="1">Кредитовый</option>
+                                <option value="2">Вклад</option>
+                                <option value="3">Инвестиции</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="creditLimit">Кредитный лимит</label>
+                            <input type="number" class="form-control" id="creditLimit" name="creditLimit" placeholder="Введите кредитный лимит (если применимо)">
+                        </div>
+                        <div class="form-group">
+                            <label for="isMain">Сделать основным счетом</label>
+                            <select class="form-control" id="isMain" name="isMain" required>
+                                <option value="1">Да</option>
+                                <option value="0">Нет</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning mt-3" name="createAccount">Создать счет</button>
+                    </form>
+                    <?php
+                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createAccount'])) {
+                        $accountData = [
+                            'name' => $_POST['accountName'] ?? '',
+                            'type' => isset($_POST['accountType']) ? (int)$_POST['accountType'] : 0,
+                            'creditLimit' => isset($_POST['creditLimit']) ? (int)$_POST['creditLimit'] : 0,
+                            'isMain' => isset($_POST['isMain']) ? (bool)$_POST['isMain'] : false
+                        ];
+
+                        $response = createAccount($accountData, $_COOKIE['token']);
+
+                        if ($response) {
+                            echo '<div class="alert alert-success mt-3">Счет успешно создан!</div>';
+                        } else {
+                            echo '<div class="alert alert-danger mt-3">Ошибка создания счета</div>';
+                        }
+                        echo "<script>setTimeout(function() {window.location.href = '/';}, 5500); </script>";
+                    }
+                    ?>
                 </div>
             </div>
         </div>
@@ -70,7 +153,7 @@ if(!$user) {
     <!-- Форма редактирования профиля -->
     <div id="editProfileForm" class="action-form card p-4 my-5" style="display: none;">
         <h5 class="mb-3">Редактировать профиль</h5>
-        <form method="post" action="#">
+        <form method="post" action="">
             <div class="form-group">
             <label for="lastName">Фамилия</label>
             <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Введите фамилию" value="<?php echo htmlspecialchars($user['lastName'] ?? ''); ?>" required>
@@ -120,9 +203,9 @@ if(!$user) {
             $response = updateUserProfile($updatedData, $_COOKIE['token']);
 
             if ($response) {
-                echo "<script>alert('Профиль успешно обновлен!'); window.location.reload();</script>";
+                echo '<div class="alert alert-success mt-3">Профиль успешно обновлен!</div>';
             } else {
-                echo "<script>alert('Ошибка обновления профиля: " . htmlspecialchars($response['message']) . "');</script>";
+                echo '<div class="alert alert-danger mt-3">Ошибка обновления профиля</div>';
             }
             echo "<script>window.location.href = '/';</script>";
             }
@@ -135,11 +218,11 @@ if(!$user) {
     <div class="row">
         <div class="col-md-12 text-center">
             <h5 class="text-highlight mb-4">Операции над вашими счетами</h5>
-            <div class="btn-group" role="group">
-                <button class="btn btn-warning m-2" onclick="showForm('depositForm')">Пополнить счет</button>
-                <button class="btn btn-warning m-2" onclick="showForm('withdrawForm')">Снять со счета</button>
-                <button class="btn btn-warning m-2" onclick="showForm('transferForm')">Перевести на другой счет</button>
-                <button class="btn btn-warning m-2" onclick="showForm('viewAccountsForm')">Просмотр моих счетов</button>
+            <div class="d-flex flex-wrap justify-content-center">
+                <button class="btn btn-warning m-2" style="flex: 1 1 auto; min-width: 150px;" onclick="showForm('depositForm')">Пополнить счет</button>
+                <button class="btn btn-warning m-2" style="flex: 1 1 auto; min-width: 150px;" onclick="showForm('withdrawForm')">Снять со счета</button>
+                <button class="btn btn-warning m-2" style="flex: 1 1 auto; min-width: 150px;" onclick="showForm('transferForm')">Перевести на другой счет</button>
+                <button class="btn btn-warning m-2" style="flex: 1 1 auto; min-width: 150px;" onclick="showForm('viewAccountsForm')">Просмотр моих счетов</button>
             </div>
         </div>
     </div>
@@ -149,80 +232,166 @@ if(!$user) {
             <!-- Форма пополнения -->
             <div id="depositForm" class="action-form card p-4 my-5" style="display: none;">
                 <h5 class="mb-3">Пополнить счет</h5>
-                <form>
+                <form method="post" action="">
                     <div class="form-group">
-                        <label for="phoneNumberDeposit">Номер телефона</label>
-                        <input type="text" class="form-control" id="phoneNumberDeposit" placeholder="Введите номер телефона">
+                        <label for="accountNumberDeposit">Номер счета</label>
+                        <input type="text" class="form-control" id="accountNumberDeposit" name="accountNumberDeposit" placeholder="Введите номер счета" required>
                     </div>
                     <div class="form-group">
                         <label for="depositAmount">Сумма</label>
-                        <input type="number" class="form-control" id="depositAmount" placeholder="Введите сумму">
+                        <input type="number" class="form-control" id="depositAmount" name="depositAmount" placeholder="Введите сумму" required>
                     </div>
-                    <button type="submit" class="btn btn-warning mt-3">Пополнить</button>
+                    <button type="submit" class="btn btn-warning mt-3" name="replenishAccount">Пополнить</button>
                 </form>
+                <?php
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['replenishAccount'])) {
+                    $accountNumber = $_POST['accountNumberDeposit'] ?? '';
+                    $amount = $_POST['depositAmount'] ?? 0;
+
+                    if (!empty($accountNumber) && $amount > 0) {
+                        $response = replenishAccount($accountNumber, (int)$amount, $_COOKIE['token']);
+
+                        if ($response) {
+                            echo '<div class="alert alert-success mt-3">Счет успешно пополнен!</div>';
+                        } else {
+                            echo '<div class="alert alert-danger mt-3">Ошибка пополнения счета</div>';
+                        }
+                    } else {
+                        echo '<div class="alert alert-warning mt-3">Пожалуйста, заполните все поля корректно</div>';
+                    }
+                    echo "<script>setTimeout(function() {window.location.href = '/';}, 1500); </script>";
+                }
+
+                
+                ?>
             </div>
 
             <!-- Форма снятия -->
             <div id="withdrawForm" class="action-form card p-4 my-5" style="display: none;">
                 <h5 class="mb-3">Снять со счета</h5>
-                <form>
+                <form method="post" action="">
                     <div class="form-group">
-                        <label for="phoneNumberWithdraw">Номер телефона</label>
-                        <input type="text" class="form-control" id="phoneNumberWithdraw" placeholder="Введите номер телефона">
+                        <label for="accountNumberWithdraw">Номер счета</label>
+                        <input type="text" class="form-control" id="accountNumberWithdraw" name="accountNumberWithdraw" placeholder="Введите номер счета" required>
                     </div>
                     <div class="form-group">
                         <label for="withdrawAmount">Сумма</label>
-                        <input type="number" class="form-control" id="withdrawAmount" placeholder="Введите сумму">
+                        <input type="number" class="form-control" id="withdrawAmount" name="withdrawAmount" placeholder="Введите сумму" required>
                     </div>
-                    <button type="submit" class="btn btn-warning mt-3">Снять</button>
+                    <button type="submit" class="btn btn-warning mt-3" name="withdrawFromAccount">Снять</button>
                 </form>
+                <?php
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['withdrawFromAccount'])) {
+                    $accountNumber = $_POST['accountNumberWithdraw'] ?? '';
+                    $amount = $_POST['withdrawAmount'] ?? 0;
+
+                    if (!empty($accountNumber) && $amount > 0) {
+                        $response = withdrawFromAccount($accountNumber, (int)$amount, $_COOKIE['token']);
+
+                        if ($response) {
+                            echo '<div class="alert alert-success mt-3">Сумма успешно снята со счета!</div>';
+                        } else {
+                            echo '<div class="alert alert-danger mt-3">Ошибка снятия со счета</div>';
+                        }
+                    } else {
+                        echo '<div class="alert alert-warning mt-3">Пожалуйста, заполните все поля корректно</div>';
+                    }
+                    echo "<script>setTimeout(function() {window.location.href = '/';}, 1500); </script>";
+                }
+                ?>
             </div>
 
             <!-- Форма перевода -->
             <div id="transferForm" class="action-form card p-4 my-5" style="display: none;">
                 <h5 class="mb-3">Перевести на другой счет</h5>
-                <form>
+                <form method="post" action="">
                     <div class="form-group">
-                        <label for="phoneNumberTransfer">Номер телефона</label>
-                        <input type="text" class="form-control" id="phoneNumberTransfer" placeholder="Введите номер телефона">
+                        <label for="phoneNumberTransfer">Номер телефона получателя</label>
+                        <input type="text" class="form-control" id="phoneNumberTransfer" name="phoneNumberTransfer" placeholder="Введите номер телефона" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountNumberTransfer">Номер вашего счета</label>
+                        <input type="text" class="form-control" id="accountNumberTransfer" name="accountNumberTransfer" placeholder="Введите номер счета" required>
                     </div>
                     <div class="form-group">
                         <label for="transferAmount">Сумма</label>
-                        <input type="number" class="form-control" id="transferAmount" placeholder="Введите сумму">
+                        <input type="number" class="form-control" id="transferAmount" name="transferAmount" placeholder="Введите сумму" required>
                     </div>
-                    <button type="submit" class="btn btn-warning mt-3">Перевести</button>
+                    <button type="submit" class="btn btn-warning mt-3" name="transferToAccount">Перевести</button>
                 </form>
+                <?php
+                if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['transferToAccount'])) {
+                    $phoneNumber = $_POST['phoneNumberTransfer'] ?? '';
+                    $accountNumber = $_POST['accountNumberTransfer'] ?? '';
+                    $amount = $_POST['transferAmount'] ?? 0;
+
+                    if (!empty($phoneNumber) && !empty($accountNumber) && $amount > 0) {
+                        $response = transferToAccount($phoneNumber, $accountNumber, (int)$amount, $_COOKIE['token']);
+
+                        if ($response) {
+                            echo '<div class="alert alert-success mt-3">Перевод успешно выполнен!</div>';
+                        } else {
+                            echo '<div class="alert alert-danger mt-3">Ошибка перевода</div>';
+                        }
+                    } else {
+                        echo '<div class="alert alert-warning mt-3">Пожалуйста, заполните все поля корректно</div>';
+                    }
+                    echo "<script>setTimeout(function() {window.location.href = '/';}, 5500); </script>";
+                }
+                ?>
             </div>
 
             <!-- Форма просмотра счетов -->
             <div id="viewAccountsForm" class="action-form card p-4 my-5" style="display: none;">
                 <h5 class="mb-3">Просмотр моих счетов</h5>
-                <table class="table table-dark table-hover">
-                    <thead>
-                        <tr>
-                            <th>Номер вашего счета</th>
-                            <th>Тип счета</th>
-                            <th>Баланс</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>+1234567890</td>
-                            <td>Сберегательный</td>
-                            <td>10,000 ₽</td>
-                        </tr>
-                        <tr>
-                            <td>+0987654321</td>
-                            <td>Текущий</td>
-                            <td>5,000 ₽</td>
-                        </tr>
-                        <tr>
-                            <td>+4567891230</td>
-                            <td>Депозитный</td>
-                            <td>20,000 ₽</td>
-                        </tr>
-                    </tbody>
-                </table>
+                
+                <form method="post" action="#">
+                    <button type="submit" class="btn btn-warning mb-3" name="refreshAccounts">Обновить</button>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Номер счета</th>
+                                <th>Тип</th>
+                                <th>Состояние</th>
+                                <th>Баланс</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTableBody">
+                            <?php
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['refreshAccounts'])) {
+                                $accounts = getAccounts($_COOKIE['token']);
+                            }
+                            if (is_array($accounts) && count($accounts) > 0) {
+                                foreach ($accounts as $account) {
+                                    $typeMapping = [
+                                        0 => "Дебетовый",
+                                        1 => "Кредитовый",
+                                        2 => "Вклад",
+                                        3 => "Инвестиции"
+                                    ];
+                                    $stateMapping = [
+                                        0 => "Открыт",
+                                        1 => "Закрыт"
+                                    ];
+
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($account['name']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($account['id']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($typeMapping[$account['type']] ?? 'Неизвестный тип') . "</td>";
+                                    echo "<td>" . htmlspecialchars($stateMapping[$account['state']] ?? 'Неизвестное состояние') . "</td>";
+                                    echo "<td>" . htmlspecialchars($account['balance']) . " ₽</td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='5'>Нет доступных счетов</td></tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
