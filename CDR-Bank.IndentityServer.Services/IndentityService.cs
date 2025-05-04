@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using CDR_Bank.Libs.Identity.Contracts.RequestContracts;
 using Microsoft.EntityFrameworkCore;
+using MySqlX.XDevAPI.Common;
 
 
 namespace CDR_Bank.IndentityServer.Services
@@ -26,7 +27,8 @@ namespace CDR_Bank.IndentityServer.Services
         {
             var bayts = Encoding.UTF8.GetBytes(loginData.Password);
             var passwordHash = SHA512.HashData(bayts);
-            var user = _context.Users.FirstOrDefault(u => (u.Email == loginData.Email)&&(u.PasswordHash==passwordHash.ToString()));
+            var pass = System.Text.Encoding.Default.GetString(passwordHash); 
+            var user = _context.Users.FirstOrDefault(u => (u.Email == loginData.Email)&&(u.PasswordHash== pass));
             if (user is null)
             {
                 return string.Empty;
@@ -44,11 +46,12 @@ namespace CDR_Bank.IndentityServer.Services
 
             var bayts = Encoding.UTF8.GetBytes(registrationData.Password);
             var passwordHash = SHA512.HashData(bayts);
+            var pass = System.Text.Encoding.Default.GetString(passwordHash);
             var user = new User
             {
                 Id = Guid.NewGuid(),
                 Email = registrationData.Email,
-                PasswordHash = passwordHash!.ToString()
+                PasswordHash = pass
             };
 
             _context.Users.Add(user);
