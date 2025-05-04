@@ -28,7 +28,7 @@ namespace CDR_Bank.IndentityServer.Services
             var bayts = Encoding.UTF8.GetBytes(loginData.Password);
             var passwordHash = SHA512.HashData(bayts);
             var pass = System.Text.Encoding.Default.GetString(passwordHash); 
-            var user = _context.Users.FirstOrDefault(u => (u.Email == loginData.Email)&&(u.PasswordHash== pass));
+            var user = _context.Users.FirstOrDefault(u => (u.Email == loginData.Email)&&(u.PasswordHash == pass));
             if (user is null)
             {
                 return string.Empty;

@@ -95,6 +95,8 @@ namespace CDR_Bank.Banking.Services
             var account = _accountValidationService.GetAccountIfOpen(bankingAccountId)
                           ?? throw new InvalidOperationException("Account not found or is closed.");
 
+            _ = _accountValidationService.CanReplenish(account, amount) ? true : throw new InvalidOperationException("Ты слишком много го хочешь") ;
+
             CheckAndAddBonusToDebit(userId, amount);
 
             account.Balance += amount;
@@ -127,7 +129,7 @@ namespace CDR_Bank.Banking.Services
                         BankingAccountId = account.Id,
                         Type = TransactionType.Replenish,
                         Status = TransactionStatus.Completed,
-                        Amount = amount,
+                        Amount = BONUS_AMOUNT,
                         CreatedAt = DateTime.UtcNow,
                         Description = "The deposit bonus is more than one million"
                     });

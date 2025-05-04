@@ -9,6 +9,8 @@ namespace CDR_Bank.Banking.Services
     {
         private const decimal NEGATIVE_CREDIT_THRESHOLD = -20_000m;
         private const decimal MAX_WITHDRAW_AMOUNT = 30_000m;
+        private const decimal MAX_REPLENISH = 10_000_000m;
+
 
         private readonly BankingDataContext _bankingDataContext;
 
@@ -68,6 +70,16 @@ namespace CDR_Bank.Banking.Services
                 .Any(a => a.UserId == userId
                           && a.Type == BankAccountType.Credit
                           && a.Balance <= NEGATIVE_CREDIT_THRESHOLD);
+        }
+
+        public bool CanReplenish(BankAccount account, decimal amount)
+        {
+            if (account == null)
+                return false;
+
+            if (amount > MAX_REPLENISH)
+                return false;
+            return true;
         }
     }
 }

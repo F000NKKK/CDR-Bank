@@ -23,5 +23,6 @@ namespace CDR_Bank.Hub.Services.Abstractions
         /// Whether the user has a credit account with a balance below 20,000.
         /// </summary>
         bool HasNegativeCreditBalance(Guid userId);
+        bool CanReplenish(BankAccount account, decimal amount);
     }
 }
